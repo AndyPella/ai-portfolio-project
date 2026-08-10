@@ -1,1 +1,1 @@
-#ai-portfolio-projec
+#ai-portfolio-project
