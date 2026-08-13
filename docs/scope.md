@@ -19,6 +19,26 @@ The reusable workflow pattern is:
 3. Assure
 4. Respond
 
+## Selected Demonstration
+
+The primary end-to-end workflow will be **application or service onboarding**.
+
+The demonstration will use an adaptive question-and-answer capability to gather,
+clarify, validate, and return information. The completed onboarding process will
+produce an assured operational service record.
+
+A focused incident or problem management example will demonstrate how a downstream
+workflow can reuse the resulting service information.
+
+Order intake and management will be used as a cross-domain portability example. It
+will illustrate how the same framework patterns can support order information,
+inventory, fulfillment, shipping, and exception handling without being implemented
+as a second complete application.
+
+See
+[Decision 002: Framework Workflow Model and Primary Demonstration](decisions/002-framework-workflow-model.md)
+for the complete reasoning and boundaries.
+
 ## Demo Scope
 
 The prototype will include:
