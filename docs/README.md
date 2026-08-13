@@ -23,6 +23,7 @@ This directory preserves the evidence used to select, design, build, test, and p
 - **Repository references:**
   - [Equipment Readiness Data Model](requirements/equipment-readiness-data-model.md)
   - [Role-Based Equipment Views](requirements/role-based-user-views.md)
+  - [Customer Service Inventory Search Workflow](architecture/customer-service-inventory-search-workflow.md)
 
 The private Google Drive link is intentionally not published in repository
 documentation.
