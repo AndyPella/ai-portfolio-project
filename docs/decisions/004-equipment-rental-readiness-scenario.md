@@ -15,12 +15,16 @@ qualification model, or M&A systems-integration workflow.
 
 ## Decision
 
-The fictional company will be a medium-sized equipment-rental business serving
-homeowner, construction, and industrial markets.
+The fictional company is **Northstar Ridge Equipment Group**, a medium-sized
+equipment-rental business serving homeowner, construction, and industrial markets.
 
 The company operates in a growing market and expands primarily by acquiring existing
 rental businesses or locations rather than building every new operation from the
 ground up.
+
+The name is fictional. “Northstar” reinforces the concept of a defined operational
+objective, while “Equipment Group” fits an acquisition-led parent organization whose
+acquired locations may temporarily retain local identities.
 
 The greenfield internal service will establish a consistent equipment-readiness
 process across existing and acquired operations.
@@ -80,7 +84,9 @@ Possible downstream extensions after Equipment Ready include:
 - Maintenance management
 - Transfer between locations
 
-These extensions are outside the initial implementation.
+A focused, read-only availability evaluation may be used to prove the Equipment Ready
+extension point. Operational management of the downstream processes remains outside
+the initial implementation.
 
 ## Consequences
 
