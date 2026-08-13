@@ -5,6 +5,8 @@ This directory preserves the evidence used to select, design, build, test, and p
 | Location | Purpose |
 |---|---|
 | `project-scope.md` | Current project scope, constraints, and open questions |
+| `scope.md` | Authoritative objective, demonstration scope, and exclusions |
+| `assumptions.md` | Accepted assumptions and dependent-process boundaries |
 | `decisions/` | Consequential decisions and their rationale |
 | `research/` | Market, user, business, and technical research |
 | `requirements/` | Functional and nonfunctional requirements |
