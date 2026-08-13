@@ -72,6 +72,10 @@ Staff may:
 Staff may not certify inspections, complete maintenance, override readiness controls,
 add equipment, or manage rental fulfillment.
 
+See [Customer Service Inventory Search Workflow](../architecture/customer-service-inventory-search-workflow.md)
+for the accepted end-to-end search, ranking, alternative-date, acknowledgement, and
+handoff decisions.
+
 ## Mechanics
 
 ### Purpose
