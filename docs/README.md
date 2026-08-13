@@ -9,7 +9,7 @@ This directory preserves the evidence used to select, design, build, test, and p
 | `assumptions.md` | Accepted assumptions and dependent-process boundaries |
 | `decisions/` | Consequential decisions and their rationale |
 | `research/` | Market, user, business, technical, and future-demo research |
-| `requirements/` | Functional, nonfunctional, and data requirements |
+| `requirements/` | Functional, nonfunctional, data, and role-based view requirements |
 | `architecture/` | Workflow, system, data, integration, and control designs |
 | `testing/` | Evaluation plans, scenarios, results, and revisions |
 | `case-study/` | Curated employer-facing build story |
@@ -20,7 +20,9 @@ This directory preserves the evidence used to select, design, build, test, and p
 - **Location:** Private project Google Drive
 - **Purpose:** Fictional seed records and repeatable test scenarios
 - **Classification:** Fictional and public-safe
-- **Repository reference:** [Equipment Readiness Data Model](requirements/equipment-readiness-data-model.md)
+- **Repository references:**
+  - [Equipment Readiness Data Model](requirements/equipment-readiness-data-model.md)
+  - [Role-Based Equipment Views](requirements/role-based-user-views.md)
 
 The private Google Drive link is intentionally not published in repository
 documentation.

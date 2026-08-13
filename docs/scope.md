@@ -65,6 +65,7 @@ See:
 - [Decision 005: Equipment Readiness and Rental Availability Boundary](decisions/005-equipment-readiness-boundary.md)
 - [Assumptions Register](assumptions.md)
 - [Equipment Readiness Data Model](requirements/equipment-readiness-data-model.md)
+- [Role-Based Equipment Views](requirements/role-based-user-views.md)
 
 for the complete reasoning, dependencies, data, and boundaries.
 
@@ -85,6 +86,12 @@ The prototype will include:
 - One focused, read-only availability evaluation proving a downstream extension point
 - Fictional seed data covering normal, conditional, conflict, remediation, and
   human-review outcomes
+- Role-based views for customer service/front counter, mechanics, managers, and general
+  staff
+- A calculated Equipment Readiness Outcome based on inspection, maintenance, defect,
+  condition, and supporting evidence
+- Illustrative manager counts for rented, not rented, pending-pickup, and expected-return
+  equipment, clearly labeled as mock future capability
 
 ## Assumed Dependencies
 
@@ -122,6 +129,12 @@ The initial prototype will not include:
 - Creating, modifying, confirming, cancelling, or fulfilling reservations
 - Equipment allocation or rental transaction execution
 - Operational management of processes after Equipment Ready
+- Adding new equipment to inventory
+- Full Other Work processing, work-order management, dispatch, parts, labor, cost, or
+  repair-completion workflows
+- Customer-service callback creation, routing, tracking, or fulfillment
+- Rental pickup, return, and current-rental management; any dashboard counts representing
+  these states are illustrative only
 
 ## Demonstration Claim
 
