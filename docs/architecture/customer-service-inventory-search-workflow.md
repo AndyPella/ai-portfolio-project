@@ -11,9 +11,9 @@ Help customer service find suitable equipment using conversational input, evalua
 readiness and availability in operational context, present ranked alternatives, and
 produce an illustrative handoff summary.
 
-## Decision Record
+## Agreed Workflow Decisions
 
-### 1. Combined Conversational Entry
+### Combined Conversational Entry
 
 Use one intelligent input rather than separate identifier and equipment-need screens.
 It accepts:
@@ -24,7 +24,7 @@ It accepts:
 
 The system determines the input type and continues through the appropriate path.
 
-### 2. Location-Aware Progressive Search
+### Location-Aware Progressive Search
 
 For an equipment-type request, the system uses the employee's current branch or work
 location as the default. It shows the quantity available now and asks for rental dates.
@@ -32,14 +32,14 @@ location as the default. It shows the quantity available now and asks for rental
 If the request already contains a location and dates, the system extracts them and
 searches directly. An explicitly entered location overrides the default.
 
-### 3. Nearby-Branch Alternatives
+### Nearby-Branch Alternatives
 
 When no suitable unit is available at the requested location and dates, the system
 automatically searches nearby branches. Alternatives clearly identify their location
 and any transfer or alternate-pickup implication. The demo does not implement transfer
 or pickup arrangements.
 
-### 4. Flexible Identifier Recognition
+### Flexible Identifier Recognition
 
 Identifier lookup normalizes safe formatting differences, including capitalization,
 spaces, expected dashes, and leading or trailing whitespace.
@@ -50,7 +50,7 @@ canonical Equipment ID.
 Broader fuzzy matches are suggestions only. A possible match must be confirmed before
 the workflow continues; the system never silently substitutes a different asset.
 
-### 5. Basic Exact-Match Summary
+### Basic Exact-Match Summary
 
 After an exact asset match, customer service sees:
 
@@ -65,7 +65,7 @@ After an exact asset match, customer service sees:
 
 Technical inspection and maintenance records remain outside the basic view.
 
-### 6. Operational-Interruption Ranking
+### Operational-Interruption Ranking
 
 When several units match, rank from least to greatest operational interruption:
 
@@ -82,7 +82,7 @@ readiness, shorter interruption, and then shorter nearby-branch distance.
 
 The system presents ranked options but does not allocate equipment automatically.
 
-### 7. Evaluation Window
+### Evaluation Window
 
 Show inspection and maintenance activity occurring from three days before the requested
 rental start through the requested rental end.
@@ -97,7 +97,7 @@ For each relevant activity, show plain-language information about:
 - Expected operational interruption
 - Effect on availability
 
-### 8. Timing-Aware Pre-Rental Ranking
+### Timing-Aware Pre-Rental Ranking
 
 Work in the three-day pre-rental window affects ranking according to completion state,
 confirmed parts and personnel, planned completion time, duration, risk to the rental
@@ -106,7 +106,7 @@ start, and overlap with the requested rental period.
 Completed or well-confirmed work ranks above incomplete, uncertain, or overlapping
 work.
 
-### 9. Twenty-Four-Hour Completion Buffer
+### Twenty-Four-Hour Completion Buffer
 
 Required inspection or maintenance must finish at least 24 hours before the rental
 starts to avoid a start-time risk.
@@ -117,7 +117,7 @@ during the rental makes the unit unavailable.
 
 The 24-hour buffer is fixed for the demo and configurable in a future implementation.
 
-### 10. Illustrative Selection Summary
+### Illustrative Selection Summary
 
 After selecting a suitable Equipment ID, show a popup, drawer, or summary screen with:
 
@@ -134,7 +134,7 @@ After selecting a suitable Equipment ID, show a popup, drawer, or summary screen
 
 The reservation reference is visibly labeled mock, illustrative, or not submitted.
 
-### 11. Conditional-Work Acknowledgement
+### Conditional-Work Acknowledgement
 
 Before showing the illustrative selection summary for equipment with planned work or an
 interruption, customer service records:
@@ -147,7 +147,7 @@ equipment and planned work, and an optional short note.
 It does not implement identity verification, signatures, consent documents, customer
 communications, contract changes, CRM updates, or legal acceptance.
 
-### 12. Customer Declines Conditions
+### Customer Declines Conditions
 
 If the customer declines planned work or interruption, return to the ranked results
 while preserving equipment type, dates, location, capabilities, and other search
@@ -160,7 +160,7 @@ If no compliant alternative exists, terminate the selection with **No suitable
 equipment available for the requested period**. Required inspection or maintenance
 cannot be waived, postponed, or bypassed.
 
-### 13. Alternative Dates
+### Alternative Dates
 
 When the original period cannot be satisfied, offer valid alternative date ranges.
 
@@ -169,7 +169,7 @@ The earliest possible alternative begins after required work completion plus the
 reevaluated for readiness, reservations, inspection, maintenance, and the three-day
 pre-rental window.
 
-### 14. All Ranked Alternatives
+### All Ranked Alternatives
 
 Show every valid alternative date found within the configured search period. Rank by:
 
@@ -182,14 +182,14 @@ Show every valid alternative date found within the configured search period. Ran
 7. Shortest nearby-branch distance
 8. Least interruption when interruption-free choices do not exist
 
-### 15. Thirty-Day Search Horizon
+### Thirty-Day Search Horizon
 
 Search for alternatives through 30 days after the originally requested start date.
 
 If no valid result exists, return **No suitable equipment or alternative dates were
 found within 30 days of the requested start date**.
 
-### 16. Confirmed Equipment Terminology
+### Confirmed Equipment Terminology
 
 Recognize common terminology, abbreviations, singular/plural forms, and clear spelling
 variations. Confirm the interpreted inventory term before searching when normalization
@@ -198,7 +198,7 @@ could change meaning.
 Ambiguous terms produce choices rather than silent substitution. For example, “lift”
 requires clarification among applicable lift equipment types.
 
-### 17. Conditional Capability Questions
+### Conditional Capability Questions
 
 Ask capability questions only when multiple configurations exist or recorded
 requirements affect suitability. Examples include capacity, height, attachments, site
@@ -208,7 +208,7 @@ Confirmed capabilities remain in the search context and apply to local, nearby-b
 and alternative-date results. The system does not recommend equipment outside its
 recorded capabilities.
 
-### 18. Display-Only Mock Customer Context
+### Display-Only Mock Customer Context
 
 Customer context is not required for the equipment search. The final illustrative
 summary may show clearly labeled mock customer information to demonstrate a future
