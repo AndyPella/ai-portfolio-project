@@ -159,6 +159,42 @@ Key fields:
 - `access_windows`
 - `operational_notes`
 
+## Derived Equipment Readiness Outcome
+
+`equipment_readiness_outcome` is a calculated interface result rather than a
+manually maintained source field. Equipment ID is the required primary identifier;
+serial number is supporting information and an alternate mechanic lookup.
+
+The readiness evaluation considers:
+
+- Whether the required inspection occurred after the most recent rental or use.
+- Whether the current required inspection passed.
+- Whether unresolved inspection defects or corrective work remain.
+- Whether overdue or blocking maintenance remains outstanding.
+- Whether condition, status, and supporting evidence agree.
+
+Supported readiness values are:
+
+- `Equipment Ready`
+- `Inspection Required`
+- `Maintenance Required`
+- `Not Ready`
+- `Human Review Required`
+
+The existing `current_status` field is source information and must not override
+contradictory inspection, maintenance, defect, or condition evidence.
+
+Equipment Readiness remains separate from an Availability Outcome. Readiness asks
+whether the asset is generally operationally ready. Availability asks whether a ready
+asset can support a particular period and limited operational context.
+
+## Presentation-Only Fields
+
+The manager view may show illustrative counts for equipment currently rented, equipment
+not currently rented, pending pickup, and expected return. These mock values demonstrate
+a future connected rental or CRM capability and are not authoritative records in the
+current data model.
+
 ## Relationships
 
 - One equipment record may have many inspection records.
@@ -202,4 +238,6 @@ Key fields:
 - Availability must cover the complete requested window, including configured buffers.
 - Underlying inspection and maintenance evidence takes precedence over a summary status.
 - Missing or contradictory evidence must not produce an unsupported ready result.
+- Users do not directly edit the calculated Equipment Readiness Outcome.
+- Manager rental-movement counts are illustrative and must be labeled as mock data.
 - Customer data must remain limited to the operational context required by the test.
