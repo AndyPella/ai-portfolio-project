@@ -22,41 +22,42 @@ The reusable workflow pattern is:
 ## Selected Demonstration
 
 The primary end-to-end workflow will be **general operational-readiness
-onboarding for a fictional greenfield service**.
+onboarding for qualified equipment within a fictional equipment-rental company**.
 
-The working scenario will follow a fictional customer appointment and notification
-service through selected lifecycle stages:
+The fictional company is a medium-sized equipment-rental business serving homeowner,
+construction, and industrial markets. It operates in a growing market and expands
+primarily through acquisitions.
 
-1. Concept
-2. Planning and design
-3. Build and preparation
-4. Readiness evaluation
-5. Launch and transition
-6. Operational reuse
+The greenfield internal service will establish a consistent equipment-readiness
+process across existing and acquired operations. The workflow begins with an
+already-qualified equipment item and ends with the assured status:
+
+> **Equipment Ready**
+
+Equipment Ready is the endpoint of the current demonstration and an extension point
+for possible downstream rental and asset-lifecycle processes.
 
 The demonstration will use an adaptive question-and-answer capability to gather,
-clarify, validate, and return information appropriate to each selected lifecycle
-stage. It will progressively build a living operational service record rather than
-performing one large assessment immediately before launch.
+clarify, validate, and return information. It will progressively build a living
+operational record rather than perform one large assessment immediately before an
+operational decision.
 
-The completed record will support the launch-readiness decision and remain available
-for later requests, incidents, problems, and service changes.
+The workflow may retrieve equipment, customer, and operational information from
+simulated, already-connected company sources. Customers are not users of the workflow,
+and the demonstration will not provide CRM functions.
 
 The demonstration will remain independent of observability-specific and
 Salesforce-derived workflows, terminology, forms, decision trees, organizational
 structures, and data.
 
-Order intake and management will remain a cross-domain portability example. It will
-illustrate how the same framework patterns can support order information, inventory,
-fulfillment, shipping, and exception handling without being implemented as a second
-complete application.
-
 See:
 
 - [Decision 002: Framework Workflow Model and Primary Demonstration](decisions/002-framework-workflow-model.md)
 - [Decision 003: Greenfield Operational-Readiness Demonstration](decisions/003-greenfield-operational-readiness.md)
+- [Decision 004: Equipment-Rental Operational-Readiness Scenario](decisions/004-equipment-rental-readiness-scenario.md)
+- [Assumptions Register](assumptions.md)
 
-for the complete reasoning and boundaries.
+for the complete reasoning, dependencies, and boundaries.
 
 ## Demo Scope
 
@@ -66,12 +67,26 @@ The prototype will include:
 - One fully implemented business workflow
 - One configurable decision tree
 - Two organizational configurations using the same core logic
-- One simulated data source or integration
+- One or more simulated retrievals from already-connected data sources
+- Limited customer context used only for internal operational decisions
 - Human review for uncertain, unsupported, or higher-risk results
 - An audit trail connecting inputs, evidence, decisions, and outcomes
 - One lightweight example showing how another workflow could be added
-- Progressive information gathering across selected greenfield lifecycle stages
-- A reusable operational service record that supports pre-launch and post-launch work
+- Progressive information gathering through the equipment-readiness process
+- A reusable operational record that supports the Equipment Ready decision
+
+## Assumed Dependencies
+
+The prototype assumes that:
+
+- Represented equipment has passed all upstream asset-qualification gates.
+- Required equipment, customer, and operational systems and data have already been
+  migrated or connected and are operationally available.
+- Customer data is an authorized, limited internal reference source rather than a CRM
+  function.
+
+The authoritative details and exclusions are maintained in the
+[Assumptions Register](assumptions.md).
 
 ## Out of Scope
 
@@ -90,6 +105,10 @@ The initial prototype will not include:
 - A complete product-development or project-management methodology
 - An observability-specific onboarding process
 - Internal Salesforce processes, data, or artifacts
+- Asset valuation, acquisition assessment, or fleet portfolio selection
+- M&A system migration, integration, reconciliation, or cutover
+- CRM, sales, marketing, or customer credit functions
+- Reservation, allocation, fulfillment, or rental processing after Equipment Ready
 
 ## Demonstration Claim
 
@@ -102,5 +121,5 @@ The initial prototype will not include:
 
 The framework’s flexibility and extensibility will be demonstrated through
 configuration and focused examples. The prototype will not attempt to implement
-every possible workflow, organizational structure, lifecycle activity, or
-integration.
+every possible workflow, organizational structure, lifecycle activity, dependency,
+or integration.
