@@ -21,22 +21,41 @@ The reusable workflow pattern is:
 
 ## Selected Demonstration
 
-The primary end-to-end workflow will be **application or service onboarding**.
+The primary end-to-end workflow will be **general operational-readiness
+onboarding for a fictional greenfield service**.
+
+The working scenario will follow a fictional customer appointment and notification
+service through selected lifecycle stages:
+
+1. Concept
+2. Planning and design
+3. Build and preparation
+4. Readiness evaluation
+5. Launch and transition
+6. Operational reuse
 
 The demonstration will use an adaptive question-and-answer capability to gather,
-clarify, validate, and return information. The completed onboarding process will
-produce an assured operational service record.
+clarify, validate, and return information appropriate to each selected lifecycle
+stage. It will progressively build a living operational service record rather than
+performing one large assessment immediately before launch.
 
-A focused incident or problem management example will demonstrate how a downstream
-workflow can reuse the resulting service information.
+The completed record will support the launch-readiness decision and remain available
+for later requests, incidents, problems, and service changes.
 
-Order intake and management will be used as a cross-domain portability example. It
-will illustrate how the same framework patterns can support order information,
-inventory, fulfillment, shipping, and exception handling without being implemented
-as a second complete application.
+The demonstration will remain independent of observability-specific and
+Salesforce-derived workflows, terminology, forms, decision trees, organizational
+structures, and data.
 
-See
-[Decision 002: Framework Workflow Model and Primary Demonstration](decisions/002-framework-workflow-model.md)
+Order intake and management will remain a cross-domain portability example. It will
+illustrate how the same framework patterns can support order information, inventory,
+fulfillment, shipping, and exception handling without being implemented as a second
+complete application.
+
+See:
+
+- [Decision 002: Framework Workflow Model and Primary Demonstration](decisions/002-framework-workflow-model.md)
+- [Decision 003: Greenfield Operational-Readiness Demonstration](decisions/003-greenfield-operational-readiness.md)
+
 for the complete reasoning and boundaries.
 
 ## Demo Scope
@@ -51,6 +70,8 @@ The prototype will include:
 - Human review for uncertain, unsupported, or higher-risk results
 - An audit trail connecting inputs, evidence, decisions, and outcomes
 - One lightweight example showing how another workflow could be added
+- Progressive information gathering across selected greenfield lifecycle stages
+- A reusable operational service record that supports pre-launch and post-launch work
 
 ## Out of Scope
 
@@ -66,6 +87,9 @@ The initial prototype will not include:
 - A universal rules engine
 - Comprehensive hallucination detection
 - Production-scale security, availability, or deployment
+- A complete product-development or project-management methodology
+- An observability-specific onboarding process
+- Internal Salesforce processes, data, or artifacts
 
 ## Demonstration Claim
 
@@ -78,4 +102,5 @@ The initial prototype will not include:
 
 The framework’s flexibility and extensibility will be demonstrated through
 configuration and focused examples. The prototype will not attempt to implement
-every possible workflow, organizational structure, or integration.
+every possible workflow, organizational structure, lifecycle activity, or
+integration.
