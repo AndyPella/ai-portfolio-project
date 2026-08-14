@@ -58,6 +58,40 @@ test("current_status alone cannot produce Equipment Ready", () => {
   assert.equal(evaluate("EQ-1001", "2026-09-10", data).readiness_outcome, "Inspection Required");
 });
 
+test("future-dated inspections are excluded from the as-of evaluation", () => {
+  const data = copy();
+  data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001").inspection_date = "2026-09-11";
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["REQUIRED_INSPECTION_MISSING"]);
+});
+
+test("an inspection must be explicitly Passed to establish readiness", () => {
+  const data = copy();
+  data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001").result = "Pending";
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["INSPECTION_NOT_PASSED"]);
+});
+
+test("defects block readiness independently of the inspection result", () => {
+  const data = copy();
+  const equipment = data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001");
+  equipment.current_status = "Defect Open";
+  data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001").defects_found = "Hydraulic leak";
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["UNRESOLVED_BLOCKING_DEFECT"]);
+});
+
+test("a newer unrelated inspection cannot displace a required post-rental inspection", () => {
+  const data = copy();
+  const requiredInspection = data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1002");
+  data.inspections.push({
+    ...requiredInspection,
+    inspection_id: "INSP-UNRELATED-NEWER",
+    inspection_type: "Annual certification",
+    required_after_each_rental: false,
+    inspection_date: "2026-09-09",
+    valid_until: "2027-09-09",
+  });
+  assert.deepEqual(evaluate("EQ-1002", "2026-09-10", data).reason_codes, ["POST_RENTAL_INSPECTION_STALE"]);
+});
+
 test("an explicit, valid as-of date is required", () => {
   assert.throws(() => evaluate("EQ-1001", ""), /asOfDate/);
   assert.throws(() => evaluate("EQ-1001", "2026-02-30"), /asOfDate/);

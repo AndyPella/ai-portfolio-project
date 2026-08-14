@@ -21,6 +21,7 @@ export type ReadinessReasonCode =
   | "FAILED_INSPECTION"
   | "UNRESOLVED_BLOCKING_DEFECT"
   | "REQUIRED_INSPECTION_MISSING"
+  | "INSPECTION_NOT_PASSED"
   | "POST_RENTAL_INSPECTION_STALE"
   | "INSPECTION_EXPIRED"
   | "INSPECTION_HOURS_EXCEEDED"
@@ -103,15 +104,16 @@ export function evaluateEquipmentReadiness(
   if (!equipment) throw new Error(`Unknown equipment_id '${equipmentId}'`);
 
   const inspections = dataset.inspections
-    .filter(({ equipment_id }) => equipment_id === equipmentId)
+    .filter(({ equipment_id, inspection_date }) => equipment_id === equipmentId && inspection_date <= asOfDate)
     .toSorted((a, b) => b.inspection_date.localeCompare(a.inspection_date) || b.inspection_id.localeCompare(a.inspection_id));
   const maintenance = dataset.maintenance.filter(({ equipment_id }) => equipment_id === equipmentId);
   const latestInspection = inspections[0];
+  const latestRequiredPostRentalInspection = inspections.find(({ required_after_each_rental }) => required_after_each_rental);
   const failed = latestInspection?.result.trim().toLowerCase() === "failed" ? [latestInspection] : [];
-  const unresolvedDefects = failed.filter((inspection) =>
+  const unresolvedDefects = latestInspection ? [latestInspection].filter((inspection) =>
     inspection.defects_found.trim().toLowerCase() !== "none" &&
     !maintenance.some((record) => record.maintenance_type.toLowerCase().includes("repair") && completedStatuses.has(record.status.toLowerCase())),
-  );
+  ) : [];
   const dueMaintenance = maintenance.filter((record) => {
     if (completedStatuses.has(record.status.toLowerCase()) || record.operational_interruption === "No interruption") return false;
     return (record.due_date !== null && record.due_date <= asOfDate) ||
@@ -152,13 +154,16 @@ export function evaluateEquipmentReadiness(
 
   const inspectionFindings: Finding[] = [];
   if (!latestInspection) {
-    inspectionFindings.push({ code: "REQUIRED_INSPECTION_MISSING", explanation: "No inspection record exists for this equipment.", evidence: equipmentEvidence(equipment, ["equipment_id"]) });
+    inspectionFindings.push({ code: "REQUIRED_INSPECTION_MISSING", explanation: "No inspection record exists for this equipment on or before the supplied as-of date.", evidence: equipmentEvidence(equipment, ["equipment_id"]) });
   } else {
-    if (latestInspection.required_after_each_rental && latestInspection.inspection_date <= equipment.last_rental_end) {
-      inspectionFindings.push({ code: "POST_RENTAL_INSPECTION_STALE", explanation: `Inspection ${latestInspection.inspection_id} did not occur after the last rental ended.`, evidence: inspectionEvidence(latestInspection, ["inspection_date", "required_after_each_rental"]) });
+    if (latestInspection.result.trim().toLowerCase() !== "passed") {
+      inspectionFindings.push({ code: "INSPECTION_NOT_PASSED", explanation: `Inspection ${latestInspection.inspection_id} does not have an explicit Passed result.`, evidence: inspectionEvidence(latestInspection, ["result"]) });
     }
     if (latestInspection.valid_until < asOfDate) inspectionFindings.push({ code: "INSPECTION_EXPIRED", explanation: `Inspection ${latestInspection.inspection_id} expired before the supplied as-of date.`, evidence: inspectionEvidence(latestInspection, ["valid_until"]) });
     if (latestInspection.next_due_hours !== null && equipment.operating_hours >= latestInspection.next_due_hours) inspectionFindings.push({ code: "INSPECTION_HOURS_EXCEEDED", explanation: `Inspection ${latestInspection.inspection_id} is due at the current operating hours.`, evidence: inspectionEvidence(latestInspection, ["next_due_hours"]) });
+  }
+  if (latestRequiredPostRentalInspection && latestRequiredPostRentalInspection.inspection_date <= equipment.last_rental_end) {
+    inspectionFindings.push({ code: "POST_RENTAL_INSPECTION_STALE", explanation: `Inspection ${latestRequiredPostRentalInspection.inspection_id} did not occur after the last rental ended.`, evidence: inspectionEvidence(latestRequiredPostRentalInspection, ["inspection_date", "required_after_each_rental"]) });
   }
   if (inspectionFindings.length) return result(equipmentId, "Inspection Required", inspectionFindings, asOfDate);
 
