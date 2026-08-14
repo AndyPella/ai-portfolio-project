@@ -52,3 +52,8 @@ Apply these rules when exporting or preparing a snapshot:
 
 The validator is deterministic: it checks representation and referential integrity
 without comparing records with the current system date.
+
+The Equipment Readiness engine validates this snapshot through the established
+validator before evaluation. Unlike snapshot validation, readiness time rules require
+an explicit caller-supplied as-of date; they never use the system clock. The engine
+does not mutate the snapshot or connect to the private Sheet.

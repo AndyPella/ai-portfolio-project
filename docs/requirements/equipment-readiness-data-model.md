@@ -241,3 +241,22 @@ current data model.
 - Users do not directly edit the calculated Equipment Readiness Outcome.
 - Manager rental-movement counts are illustrative and must be labeled as mock data.
 - Customer data must remain limited to the operational context required by the test.
+
+## Deterministic Rule Precedence
+
+The readiness engine consumes the validated, static JSON snapshot and requires an
+explicit `YYYY-MM-DD` as-of date. It does not read reservations, customers, proposed
+rental dates, buffers, or projected rental operating hours. Findings are resolved in
+this strict order:
+
+1. Contradictory evidence requiring reconciliation → `Human Review Required`.
+2. Explicit failed inspection or unresolved blocking defect → `Not Ready`.
+3. Missing, expired, hours-due, or stale post-rental inspection → `Inspection Required`.
+4. Due or overdue blocking calendar/hour maintenance → `Maintenance Required`.
+5. Missing qualification, attachment, inspection, or maintenance evidence → `Human Review Required`.
+6. All required controls satisfied → `Equipment Ready`.
+
+The result includes the Equipment ID, outcome, stable reason codes, explanations,
+source-record evidence references, and the supplied as-of date. `current_status`
+remains context only: it can expose a contradiction but can never establish readiness
+without the underlying controls.
