@@ -1,3 +1,8 @@
+import snapshot from "../data/northstar-ridge-demo-data.json";
+import { validateNorthstarRidgeDataset } from "../data/northstar-ridge-data";
+
+validateNorthstarRidgeDataset(snapshot);
+
 const ArrowIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 20 20">
     <path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" />

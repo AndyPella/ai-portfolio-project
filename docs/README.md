@@ -13,11 +13,14 @@ This directory preserves the evidence used to select, design, build, test, and p
 | `architecture/` | Workflow, system, data, integration, and control designs |
 | `testing/` | Evaluation plans, scenarios, results, and revisions |
 | `case-study/` | Curated employer-facing build story |
+| `data-snapshot-workflow.md` | Authoritative Sheet-to-snapshot workflow and normalization rules |
 
 ## Working Dataset
 
 - **Name:** Northstar Ridge Equipment Readiness Demo Data
 - **Location:** Private project Google Drive
+- **Editable source:** Private Google Sheet
+- **Runtime snapshot:** `data/northstar-ridge-demo-data.json`
 - **Purpose:** Fictional seed records and repeatable test scenarios
 - **Classification:** Fictional and public-safe
 - **Repository references:**
@@ -29,6 +32,9 @@ This directory preserves the evidence used to select, design, build, test, and p
 
 The private Google Drive link is intentionally not published in repository
 documentation.
+
+See [Northstar Ridge Data Snapshot Workflow](data-snapshot-workflow.md) for the
+authoritative Google Sheet → reviewed JSON snapshot → application process.
 
 ## Working Rule
 
