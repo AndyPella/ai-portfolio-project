@@ -136,8 +136,12 @@ Other Work demonstrates an extension point only. The input may capture:
 - Notes
 
 The demo may confirm that the item was recorded and routed for review. It does not
-implement work-order assignment, dispatch, parts management, labor tracking,
-scheduling, approval, repair completion, or cost tracking.
+implement work-order assignment, dispatch, full parts management, labor tracking,
+scheduling, approval, or cost tracking.
+
+See [Mechanic Equipment Work Workflow](../architecture/mechanic-equipment-work-workflow.md)
+for the accepted lookup, hold, work evidence, parts visibility, readiness recalculation,
+and Ready-to-Rent decisions.
 
 ## Managers
 
