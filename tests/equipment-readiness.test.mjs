@@ -70,12 +70,12 @@ test("an inspection must be explicitly Passed to establish readiness", () => {
   assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["INSPECTION_NOT_PASSED"]);
 });
 
-test("defects block readiness independently of the inspection result", () => {
+test("a defect without verifiable corrective-work linkage requires human review", () => {
   const data = copy();
   const equipment = data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001");
   equipment.current_status = "Defect Open";
   data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001").defects_found = "Hydraulic leak";
-  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["UNRESOLVED_BLOCKING_DEFECT"]);
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["DEFECT_CORRECTIVE_WORK_UNVERIFIED"]);
 });
 
 test("a newer unrelated inspection cannot displace a required post-rental inspection", () => {
@@ -90,6 +90,56 @@ test("a newer unrelated inspection cannot displace a required post-rental inspec
     valid_until: "2027-09-09",
   });
   assert.deepEqual(evaluate("EQ-1002", "2026-09-10", data).reason_codes, ["POST_RENTAL_INSPECTION_STALE"]);
+});
+
+test("all required-inspection controls evaluate the required post-rental record", () => {
+  const data = copy();
+  const requiredInspection = data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001");
+  requiredInspection.result = "Pending";
+  requiredInspection.defects_found = "Hydraulic leak";
+  requiredInspection.corrective_work_reference = "MNT-DOES-NOT-EXIST";
+  requiredInspection.valid_until = "2026-09-09";
+  requiredInspection.next_due_hours = 800;
+  data.inspections.push({
+    ...requiredInspection,
+    inspection_id: "INSP-UNRELATED-PASSED",
+    inspection_type: "Annual certification",
+    required_after_each_rental: false,
+    result: "Passed",
+    defects_found: "None",
+    corrective_work_reference: null,
+    inspection_date: "2026-09-09",
+    valid_until: "2027-09-09",
+    next_due_hours: 2000,
+  });
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["DEFECT_CORRECTIVE_WORK_UNVERIFIED"]);
+
+  requiredInspection.defects_found = "None";
+  requiredInspection.corrective_work_reference = null;
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, [
+    "INSPECTION_NOT_PASSED", "INSPECTION_EXPIRED", "INSPECTION_HOURS_EXCEEDED",
+  ]);
+});
+
+test("only explicitly linked completed corrective work resolves an inspection defect", () => {
+  const data = copy();
+  const inspection = data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001");
+  inspection.defects_found = "Hydraulic leak";
+  inspection.corrective_work_reference = "MNT-3001";
+  data.maintenance.find(({ maintenance_id }) => maintenance_id === "MNT-3001").status = "Completed";
+  assert.equal(evaluate("EQ-1001", "2026-09-10", data).readiness_outcome, "Equipment Ready");
+
+  inspection.corrective_work_reference = "UNMATCHED-REPAIR";
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["DEFECT_CORRECTIVE_WORK_UNVERIFIED"]);
+});
+
+test("adverse source status or condition cannot produce Equipment Ready", () => {
+  for (const [field, value] of [["current_status", "Out of Service"], ["current_condition", "Unsafe"]]) {
+    const data = copy();
+    data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001")[field] = value;
+    assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["ADVERSE_EQUIPMENT_STATE"]);
+    assert.equal(evaluate("EQ-1001", "2026-09-10", data).readiness_outcome, "Human Review Required");
+  }
 });
 
 test("an explicit, valid as-of date is required", () => {

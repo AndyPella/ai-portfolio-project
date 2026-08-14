@@ -18,6 +18,8 @@ export type ReadinessOutcome = (typeof READINESS_OUTCOMES)[number];
 
 export type ReadinessReasonCode =
   | "CONTRADICTORY_READY_STATUS"
+  | "ADVERSE_EQUIPMENT_STATE"
+  | "DEFECT_CORRECTIVE_WORK_UNVERIFIED"
   | "FAILED_INSPECTION"
   | "UNRESOLVED_BLOCKING_DEFECT"
   | "REQUIRED_INSPECTION_MISSING"
@@ -57,6 +59,7 @@ interface Finding {
 
 const datePattern = /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
 const completedStatuses = new Set(["closed", "complete", "completed", "resolved"]);
+const adverseStatePattern = /\b(?:out of service|unsafe|not safe|not ready|inoperable|non[ -]?operational|do not use|condemned)\b/i;
 
 function requireAsOfDate(value: string): void {
   const parsed = new Date(`${value}T00:00:00Z`);
@@ -109,11 +112,20 @@ export function evaluateEquipmentReadiness(
   const maintenance = dataset.maintenance.filter(({ equipment_id }) => equipment_id === equipmentId);
   const latestInspection = inspections[0];
   const latestRequiredPostRentalInspection = inspections.find(({ required_after_each_rental }) => required_after_each_rental);
-  const failed = latestInspection?.result.trim().toLowerCase() === "failed" ? [latestInspection] : [];
-  const unresolvedDefects = latestInspection ? [latestInspection].filter((inspection) =>
-    inspection.defects_found.trim().toLowerCase() !== "none" &&
-    !maintenance.some((record) => record.maintenance_type.toLowerCase().includes("repair") && completedStatuses.has(record.status.toLowerCase())),
-  ) : [];
+  const requiresPostRentalInspection = dataset.inspections.some(({ equipment_id, inspection_type, required_after_each_rental }) =>
+    equipment_id === equipmentId && (required_after_each_rental || inspection_type.toLowerCase().includes("post-rental")),
+  );
+  const applicableInspection = requiresPostRentalInspection ? latestRequiredPostRentalInspection : latestInspection;
+  const failed = applicableInspection?.result.trim().toLowerCase() === "failed" ? [applicableInspection] : [];
+  const hasDefect = applicableInspection !== undefined && applicableInspection.defects_found.trim().toLowerCase() !== "none";
+  const correctiveWorkReference = applicableInspection?.corrective_work_reference?.trim();
+  const linkedCorrectiveWork = correctiveWorkReference
+    ? maintenance.filter((record) => record.maintenance_id === correctiveWorkReference || record.evidence_reference === correctiveWorkReference)
+    : [];
+  const unresolvedDefects: Inspection[] = applicableInspection && hasDefect && linkedCorrectiveWork.length > 0 &&
+    !linkedCorrectiveWork.some((record) => completedStatuses.has(record.status.toLowerCase()))
+    ? [applicableInspection] : [];
+  const unverifiableDefects: Inspection[] = applicableInspection && hasDefect && linkedCorrectiveWork.length === 0 ? [applicableInspection] : [];
   const dueMaintenance = maintenance.filter((record) => {
     if (completedStatuses.has(record.status.toLowerCase()) || record.operational_interruption === "No interruption") return false;
     return (record.due_date !== null && record.due_date <= asOfDate) ||
@@ -126,6 +138,13 @@ export function evaluateEquipmentReadiness(
   );
 
   const contradictionFindings: Finding[] = [];
+  if (adverseStatePattern.test(equipment.current_status) || adverseStatePattern.test(equipment.current_condition)) {
+    contradictionFindings.push({
+      code: "ADVERSE_EQUIPMENT_STATE",
+      explanation: "The source status or condition contains adverse operational evidence that requires reconciliation.",
+      evidence: equipmentEvidence(equipment, ["current_status", "current_condition"]),
+    });
+  }
   if (equipment.current_status === "Equipment Ready" && (failed.length > 0 || unresolvedDefects.length > 0 || blockingRepairs.length > 0 || dueMaintenance.length > 0)) {
     contradictionFindings.push({
       code: "CONTRADICTORY_READY_STATUS",
@@ -152,15 +171,23 @@ export function evaluateEquipmentReadiness(
   })));
   if (notReadyFindings.length) return result(equipmentId, "Not Ready", notReadyFindings, asOfDate);
 
+  if (unverifiableDefects.length) {
+    return result(equipmentId, "Human Review Required", unverifiableDefects.map((inspection) => ({
+      code: "DEFECT_CORRECTIVE_WORK_UNVERIFIED",
+      explanation: `Inspection ${inspection.inspection_id} has a defect, but its corrective work reference does not identify a completed maintenance record.`,
+      evidence: inspectionEvidence(inspection, ["defects_found", "corrective_work_reference"]),
+    })), asOfDate);
+  }
+
   const inspectionFindings: Finding[] = [];
-  if (!latestInspection) {
-    inspectionFindings.push({ code: "REQUIRED_INSPECTION_MISSING", explanation: "No inspection record exists for this equipment on or before the supplied as-of date.", evidence: equipmentEvidence(equipment, ["equipment_id"]) });
+  if (!applicableInspection) {
+    inspectionFindings.push({ code: "REQUIRED_INSPECTION_MISSING", explanation: requiresPostRentalInspection ? "No required post-rental inspection exists for this equipment on or before the supplied as-of date." : "No inspection record exists for this equipment on or before the supplied as-of date.", evidence: equipmentEvidence(equipment, ["equipment_id"]) });
   } else {
-    if (latestInspection.result.trim().toLowerCase() !== "passed") {
-      inspectionFindings.push({ code: "INSPECTION_NOT_PASSED", explanation: `Inspection ${latestInspection.inspection_id} does not have an explicit Passed result.`, evidence: inspectionEvidence(latestInspection, ["result"]) });
+    if (applicableInspection.result.trim().toLowerCase() !== "passed") {
+      inspectionFindings.push({ code: "INSPECTION_NOT_PASSED", explanation: `Inspection ${applicableInspection.inspection_id} does not have an explicit Passed result.`, evidence: inspectionEvidence(applicableInspection, ["result"]) });
     }
-    if (latestInspection.valid_until < asOfDate) inspectionFindings.push({ code: "INSPECTION_EXPIRED", explanation: `Inspection ${latestInspection.inspection_id} expired before the supplied as-of date.`, evidence: inspectionEvidence(latestInspection, ["valid_until"]) });
-    if (latestInspection.next_due_hours !== null && equipment.operating_hours >= latestInspection.next_due_hours) inspectionFindings.push({ code: "INSPECTION_HOURS_EXCEEDED", explanation: `Inspection ${latestInspection.inspection_id} is due at the current operating hours.`, evidence: inspectionEvidence(latestInspection, ["next_due_hours"]) });
+    if (applicableInspection.valid_until < asOfDate) inspectionFindings.push({ code: "INSPECTION_EXPIRED", explanation: `Inspection ${applicableInspection.inspection_id} expired before the supplied as-of date.`, evidence: inspectionEvidence(applicableInspection, ["valid_until"]) });
+    if (applicableInspection.next_due_hours !== null && equipment.operating_hours >= applicableInspection.next_due_hours) inspectionFindings.push({ code: "INSPECTION_HOURS_EXCEEDED", explanation: `Inspection ${applicableInspection.inspection_id} is due at the current operating hours.`, evidence: inspectionEvidence(applicableInspection, ["next_due_hours"]) });
   }
   if (latestRequiredPostRentalInspection && latestRequiredPostRentalInspection.inspection_date <= equipment.last_rental_end) {
     inspectionFindings.push({ code: "POST_RENTAL_INSPECTION_STALE", explanation: `Inspection ${latestRequiredPostRentalInspection.inspection_id} did not occur after the last rental ended.`, evidence: inspectionEvidence(latestRequiredPostRentalInspection, ["inspection_date", "required_after_each_rental"]) });
@@ -180,7 +207,7 @@ export function evaluateEquipmentReadiness(
   const missingFindings: Finding[] = [];
   if (!isPresent(equipment.asset_qualification_reference)) missingFindings.push({ code: "MISSING_ASSET_QUALIFICATION", explanation: "Required asset qualification evidence is missing.", evidence: equipmentEvidence(equipment, ["asset_qualification_reference"]) });
   if (!isPresent(equipment.required_attachments)) missingFindings.push({ code: "MISSING_REQUIRED_ATTACHMENTS", explanation: "Required attachment information is missing.", evidence: equipmentEvidence(equipment, ["required_attachments"]) });
-  if (latestInspection && !isPresent(latestInspection.evidence_reference)) missingFindings.push({ code: "MISSING_INSPECTION_EVIDENCE", explanation: `Inspection ${latestInspection.inspection_id} lacks a usable evidence reference.`, evidence: inspectionEvidence(latestInspection, ["evidence_reference"]) });
+  if (applicableInspection && !isPresent(applicableInspection.evidence_reference)) missingFindings.push({ code: "MISSING_INSPECTION_EVIDENCE", explanation: `Inspection ${applicableInspection.inspection_id} lacks a usable evidence reference.`, evidence: inspectionEvidence(applicableInspection, ["evidence_reference"]) });
   for (const record of maintenance) if (!isPresent(record.evidence_reference)) missingFindings.push({ code: "MISSING_MAINTENANCE_EVIDENCE", explanation: `Maintenance ${record.maintenance_id} lacks a usable evidence reference.`, evidence: maintenanceEvidence(record, ["evidence_reference"]) });
   if (missingFindings.length) return result(equipmentId, "Human Review Required", missingFindings, asOfDate);
 
