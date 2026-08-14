@@ -92,6 +92,12 @@ The prototype will include:
   condition, and supporting evidence
 - Illustrative manager counts for rented, not rented, pending-pickup, and expected-return
   equipment, clearly labeled as mock future capability
+- A mechanic workflow demonstrating immediate Mechanic Hold, focused work evidence,
+  deterministic readiness recalculation, human-confirmed release, and Ready to Rent
+- A read-only mock parts-and-materials dependency with an AI explanation, human
+  rescheduling decision, and external-process handoff
+- A visible separation among AI assistance, human decision gates, and deterministic
+  data and rules processing
 
 ## Assumed Dependencies
 
@@ -130,8 +136,10 @@ The initial prototype will not include:
 - Equipment allocation or rental transaction execution
 - Operational management of processes after Equipment Ready
 - Adding new equipment to inventory
-- Full Other Work processing, work-order management, dispatch, parts, labor, cost, or
-  repair-completion workflows
+- Full Other Work processing, work-order management, dispatch, parts ordering or
+  procurement, labor, cost, or downstream repair-management workflows
+- Rental-aware mechanic scheduling, alternative maintenance-date calculation,
+  technician scheduling, schedule modification, or rescheduling tracking
 - Customer-service callback creation, routing, tracking, or fulfillment
 - Rental pickup, return, and current-rental management; any dashboard counts representing
   these states are illustrative only

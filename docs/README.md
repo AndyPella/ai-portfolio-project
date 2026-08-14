@@ -24,6 +24,8 @@ This directory preserves the evidence used to select, design, build, test, and p
   - [Equipment Readiness Data Model](requirements/equipment-readiness-data-model.md)
   - [Role-Based Equipment Views](requirements/role-based-user-views.md)
   - [Customer Service Inventory Search Workflow](architecture/customer-service-inventory-search-workflow.md)
+  - [Mechanic Equipment Work Workflow](architecture/mechanic-equipment-work-workflow.md)
+  - [AI, Human, And Deterministic-Control Boundary](architecture/ai-human-deterministic-control-boundary.md)
 
 The private Google Drive link is intentionally not published in repository
 documentation.
