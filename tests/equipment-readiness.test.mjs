@@ -19,7 +19,8 @@ test("EQ-1006 contradictory Ready status takes precedence over failed evidence",
 }));
 
 test("calendar and operating-hour maintenance triggers are deterministic", () => {
-  assert.equal(evaluate("EQ-1003", "2026-09-09").readiness_outcome, "Equipment Ready");
+  assert.equal(evaluate("EQ-1003", "2026-09-09").readiness_outcome, "Human Review Required");
+  assert.equal(evaluate("EQ-1003", "2026-09-10").readiness_outcome, "Maintenance Required");
   const data = copy();
   const equipment = data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001");
   equipment.operating_hours = 1000;
@@ -134,12 +135,48 @@ test("only explicitly linked completed corrective work resolves an inspection de
 });
 
 test("adverse source status or condition cannot produce Equipment Ready", () => {
-  for (const [field, value] of [["current_status", "Out of Service"], ["current_condition", "Unsafe"]]) {
+  for (const [field, value] of [
+    ["current_status", "Out of Service"],
+    ["current_condition", "Unsafe"],
+    ["current_status", "Inspection Pending"],
+    ["current_condition", "Inspection Required"],
+    ["current_status", "Maintenance Pending"],
+    ["current_condition", "Maintenance Required"],
+  ]) {
     const data = copy();
     data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001")[field] = value;
     assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["ADVERSE_EQUIPMENT_STATE"]);
     assert.equal(evaluate("EQ-1001", "2026-09-10", data).readiness_outcome, "Human Review Required");
   }
+});
+
+test("unknown source status or condition fails closed", () => {
+  for (const [field, value] of [["current_status", "Probably Ready"], ["current_condition", "Check Later"]]) {
+    const data = copy();
+    data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001")[field] = value;
+    const evaluated = evaluate("EQ-1001", "2026-09-10", data);
+    assert.equal(evaluated.readiness_outcome, "Human Review Required");
+    assert.deepEqual(evaluated.reason_codes, ["UNRECOGNIZED_EQUIPMENT_STATE"]);
+  }
+});
+
+test("conflicting status and condition evidence fails closed", () => {
+  const data = copy();
+  const equipment = data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001");
+  equipment.current_status = "Equipment Ready";
+  equipment.current_condition = "Not Ready";
+  assert.deepEqual(evaluate("EQ-1001", "2026-09-10", data).reason_codes, ["ADVERSE_EQUIPMENT_STATE"]);
+});
+
+test("recognized non-adverse source values permit readiness only when other controls pass", () => {
+  const data = copy();
+  const equipment = data.equipment.find(({ equipment_id }) => equipment_id === "EQ-1001");
+  equipment.current_status = "Operational";
+  equipment.current_condition = "Serviceable";
+  assert.equal(evaluate("EQ-1001", "2026-09-10", data).readiness_outcome, "Equipment Ready");
+
+  data.inspections.find(({ equipment_id }) => equipment_id === "EQ-1001").result = "Pending";
+  assert.equal(evaluate("EQ-1001", "2026-09-10", data).readiness_outcome, "Inspection Required");
 });
 
 test("an explicit, valid as-of date is required", () => {

@@ -19,6 +19,7 @@ export type ReadinessOutcome = (typeof READINESS_OUTCOMES)[number];
 export type ReadinessReasonCode =
   | "CONTRADICTORY_READY_STATUS"
   | "ADVERSE_EQUIPMENT_STATE"
+  | "UNRECOGNIZED_EQUIPMENT_STATE"
   | "DEFECT_CORRECTIVE_WORK_UNVERIFIED"
   | "FAILED_INSPECTION"
   | "UNRESOLVED_BLOCKING_DEFECT"
@@ -59,7 +60,30 @@ interface Finding {
 
 const datePattern = /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
 const completedStatuses = new Set(["closed", "complete", "completed", "resolved"]);
-const adverseStatePattern = /\b(?:out of service|unsafe|not safe|not ready|inoperable|non[ -]?operational|do not use|condemned)\b/i;
+const recognizedNonAdverseStatuses = new Set(["equipment ready", "ready", "available", "in service", "operational"]);
+const recognizedNonAdverseConditions = new Set(["good", "serviceable", "operational"]);
+const recognizedAdverseStates = new Set([
+  "inspection pending",
+  "inspection required",
+  "maintenance pending",
+  "maintenance required",
+  "maintenance scheduled",
+  "out of service",
+  "unsafe",
+  "not safe",
+  "not ready",
+  "inoperable",
+  "non-operational",
+  "non operational",
+  "do not use",
+  "condemned",
+  "serviceable pending maintenance",
+  "status conflicts with defect record",
+]);
+
+function normalizedState(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
 
 function requireAsOfDate(value: string): void {
   const parsed = new Date(`${value}T00:00:00Z`);
@@ -138,13 +162,6 @@ export function evaluateEquipmentReadiness(
   );
 
   const contradictionFindings: Finding[] = [];
-  if (adverseStatePattern.test(equipment.current_status) || adverseStatePattern.test(equipment.current_condition)) {
-    contradictionFindings.push({
-      code: "ADVERSE_EQUIPMENT_STATE",
-      explanation: "The source status or condition contains adverse operational evidence that requires reconciliation.",
-      evidence: equipmentEvidence(equipment, ["current_status", "current_condition"]),
-    });
-  }
   if (equipment.current_status === "Equipment Ready" && (failed.length > 0 || unresolvedDefects.length > 0 || blockingRepairs.length > 0 || dueMaintenance.length > 0)) {
     contradictionFindings.push({
       code: "CONTRADICTORY_READY_STATUS",
@@ -210,6 +227,23 @@ export function evaluateEquipmentReadiness(
   if (applicableInspection && !isPresent(applicableInspection.evidence_reference)) missingFindings.push({ code: "MISSING_INSPECTION_EVIDENCE", explanation: `Inspection ${applicableInspection.inspection_id} lacks a usable evidence reference.`, evidence: inspectionEvidence(applicableInspection, ["evidence_reference"]) });
   for (const record of maintenance) if (!isPresent(record.evidence_reference)) missingFindings.push({ code: "MISSING_MAINTENANCE_EVIDENCE", explanation: `Maintenance ${record.maintenance_id} lacks a usable evidence reference.`, evidence: maintenanceEvidence(record, ["evidence_reference"]) });
   if (missingFindings.length) return result(equipmentId, "Human Review Required", missingFindings, asOfDate);
+
+  const currentStatus = normalizedState(equipment.current_status);
+  const currentCondition = normalizedState(equipment.current_condition);
+  if (recognizedAdverseStates.has(currentStatus) || recognizedAdverseStates.has(currentCondition)) {
+    return result(equipmentId, "Human Review Required", [{
+      code: "ADVERSE_EQUIPMENT_STATE",
+      explanation: "The source status or condition is pending, required, adverse, unresolved, or conflicts with the readiness evidence.",
+      evidence: equipmentEvidence(equipment, ["current_status", "current_condition"]),
+    }], asOfDate);
+  }
+  if (!recognizedNonAdverseStatuses.has(currentStatus) || !recognizedNonAdverseConditions.has(currentCondition)) {
+    return result(equipmentId, "Human Review Required", [{
+      code: "UNRECOGNIZED_EQUIPMENT_STATE",
+      explanation: "The source status or condition is not a recognized non-adverse value and requires reconciliation.",
+      evidence: equipmentEvidence(equipment, ["current_status", "current_condition"]),
+    }], asOfDate);
+  }
 
   return result(equipmentId, "Equipment Ready", [{ code: "ALL_CONTROLS_SATISFIED", explanation: "All required readiness controls are satisfied as of the supplied date.", evidence: equipmentEvidence(equipment, ["equipment_id", "operating_hours", "current_condition"]) }], asOfDate);
 }
