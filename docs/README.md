@@ -13,7 +13,12 @@ This directory preserves the evidence used to select, design, build, test, and p
 | `architecture/` | Workflow, system, data, integration, and control designs |
 | `testing/` | Evaluation plans, scenarios, results, and revisions |
 | `case-study/` | Curated employer-facing build story |
+| `checkpoints/` | Dated project-state records and restart points |
 | `data-snapshot-workflow.md` | Authoritative Sheet-to-snapshot workflow and normalization rules |
+
+## Latest Checkpoint
+
+- [Post-PR #13 Project Progress Checkpoint](checkpoints/2026-08-14-post-pr-13.md)
 
 ## Working Dataset
 
