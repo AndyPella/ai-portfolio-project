@@ -124,6 +124,34 @@ No numerical delay allowance has been approved. Do not infer manufacturer polici
 
 The generator example begins at 480 hours, has service due at 500, and projects 40 rental hours. Its scheduled service date alone does not establish compliance; usage timing or an approved allowance is needed.
 
+## Accepted responsibility map — Item 3
+
+Accepted on 2026-10-08. These are requirements; runtime implementation remains pending.
+
+| Workflow step | AI responsibility | Deterministic rules | Human responsibility |
+|---|---|---|---|
+| Understand request | Interpret need, dates, location, intended use; ask for missing details | Validate dates and identifiers; retrieve matching records | Confirm ambiguous matches and requirements |
+| Check readiness | Explain safety, inspection, maintenance, and defect findings | Calculate readiness from verified records; enforce blockers | Inspect, certify completed work, resolve conflicting evidence |
+| Assess service during rental | Explain upcoming service and options | Evaluate projected hours, deadlines, system-group gates, warranty limits, established allowances | Review uncertain classifications; authorize delays only within permitted policy |
+| Check availability | Explain conflicts and alternatives | Evaluate reservations, holds, buffers, location, capabilities | Select equipment or revised dates |
+| Accept conditions | Present permitted service plan and interruption | Require recorded acknowledgement before conditional handoff | Customer Service records customer acceptance |
+| Resolve work and release holds | Summarize outstanding work and evidence | Recalculate readiness; prevent release while required controls fail | Authorized staff verify completion and confirm hold release |
+| Produce handoff | Summarize selection, conditions, evidence | Generate read-only outcome and traceable record | Customer Service confirms selection for existing rental process |
+
+AI interprets and explains. Deterministic rules calculate eligibility and enforce limits. Authorized staff certify work and make decisions within policy.
+
+Each human decision must record actor, timestamp, Equipment ID, decision, reason, and supporting evidence. For service delays, the system first determines whether policy permits a delay; an authorized employee approves its use for the rental. Missing policy requires review and cannot become automatic approval.
+
+Specific staff-role authorities for delay approval, certification, exception resolution, and hold release remain unresolved. No authority assignment is implied by this map.
+
+## PR 17 working agreement
+
+PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
+
+Track implementation tasks as Pending, Implemented, or Verified, with evidence for verified status. Update the PR description and validation evidence as scope evolves. Current runtime implementation status: Pending.
+
+Keep the PR open for review until the user explicitly authorizes merging. This agreement authorizes continued work on the PR; it does not authorize merging.
+
 ## Implementation checklist
 
 - [ ] Reconcile existing readiness/availability documents with these requirements.
@@ -145,6 +173,7 @@ The generator example begins at 480 hours, has service due at 500, and projects 
 
 Item 1 (repository baseline review) is complete; tests were not rerun during that review.
 Item 2 (complete equipment-readiness workflow demonstration) remains in progress.
+Item 3 responsibility map is accepted and recorded; staff-role authorities and implementation remain pending.
 
 This change documents requirements only. It does not change runtime code, data, readiness outcomes, or service schedules. Reservations remain read-only. CRM, rental execution, transfers, procurement, and broad scheduling remain outside scope.
 
