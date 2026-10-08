@@ -20,6 +20,10 @@ This directory preserves the evidence used to select, design, build, test, and p
 
 - [Post-PR #13 Project Progress Checkpoint](checkpoints/2026-08-14-post-pr-13.md)
 
+## Requirements Pending Implementation
+
+- [Rental Readiness and Service Delay Requirements](requirements/rental-readiness-service-delay-policy.md) — October 8 agreed requirements, unresolved policy decisions, and implementation checklist; runtime implementation pending.
+
 ## Working Dataset
 
 - **Name:** Northstar Ridge Equipment Readiness Demo Data
