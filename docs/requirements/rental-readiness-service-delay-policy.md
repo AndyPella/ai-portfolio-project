@@ -133,7 +133,7 @@ Accepted on 2026-10-08. These are requirements; runtime implementation remains p
 | Understand request | Interpret need, dates, location, intended use; ask for missing details | Validate dates and identifiers; retrieve matching records | Confirm ambiguous matches and requirements |
 | Check readiness | Explain safety, inspection, maintenance, and defect findings | Calculate readiness from verified records; enforce blockers | Inspect, certify completed work, resolve conflicting evidence |
 | Assess service during rental | Explain upcoming service and options | Evaluate projected hours, deadlines, system-group gates, warranty limits, established allowances | Review uncertain classifications; authorize delays only within permitted policy |
-| Check availability | Explain conflicts and alternatives | Evaluate reservations, holds, buffers, location, capabilities | Select equipment or revised dates |
+| Check availability | Explain conflicts and alternatives | Evaluate reservations, holds, buffers, location, capabilities | Approve the proposed equipment or choose revised dates |
 | Accept conditions | Present permitted service plan and interruption | Require recorded acknowledgement before conditional handoff | Customer Service records customer acceptance |
 | Resolve work and release holds | Summarize outstanding work and evidence | Recalculate readiness; prevent release while required controls fail | Authorized staff verify completion and confirm hold release |
 | Produce handoff | Summarize selection, conditions, evidence | Generate read-only outcome and traceable record | Customer Service confirms selection for existing rental process |
@@ -148,7 +148,7 @@ Approved on 2026-10-09. Qualifications must match the task; a role label alone d
 
 | Decision or action | Authority | Boundary |
 |---|---|---|
-| Confirm rental needs and select equipment | Customer Service | Select only options permitted by evaluated rules |
+| Confirm rental needs and approve proposed equipment | Customer Service | System proposes the best eligible option; approval stays within evaluated rules |
 | Record acceptance of conditions | Customer Service | Acceptance cannot waive service limits or holds |
 | Place an operational hold | Mechanic or Manager | Record reason and supporting evidence |
 | Assess defects and classify service criticality | Qualified Mechanic | Follow established policy; escalate uncertain classifications |
@@ -201,12 +201,12 @@ Approved on 2026-10-09.
 
 | Situation | System action | Staff involvement |
 |---|---|---|
-| Records complete and all rules pass | Return Rental Ready with evidence | Customer Service selects equipment |
+| Records complete and all rules pass | Return Rental Ready with evidence | Customer Service approves the automatically proposed equipment |
 | Required work has a confirmed, feasible completion plan | Return potentially available, pending work and release | Mechanic verifies completion and releases the hold within approved authority |
 | Work timing, parts, technician, or technical classification uncertain | Identify missing confirmation | Qualified Mechanic assesses and confirms |
 | Noncritical delay permitted by established policy | Show permitted limit and rental impact | Mechanic assesses; Manager approves delay |
 | Conflicting evidence or exceptional hold release | Keep readiness unconfirmed and show conflict | Manager resolves with Mechanic support |
-| Known conflict or mandatory limit prevents rental | Return Not Available and evaluate alternatives | Customer Service chooses an alternative |
+| Known conflict or mandatory limit prevents rental | Return Not Available and evaluate alternatives | System proposes an eligible alternative; Customer Service approves |
 
 AI may explain and prepare the review request. Deterministic rules select the required reviewer and keep the blocker active until a recorded decision satisfies policy. Routing does not expand the approved staff authorities.
 
@@ -257,6 +257,22 @@ Current readiness and future availability must always appear separately. Potenti
 
 Validate this presentation against one normal scenario and one exception scenario before implementation. Implementation and scenario walkthrough remain pending.
 
+## Approved automatic equipment selection and final human gate
+
+Approved on 2026-10-09 after the normal/exception walkthrough.
+
+Equipment selection is not a mandatory human step:
+1. Deterministic rules identify eligible equipment and rank it using the agreed criteria.
+2. The system automatically selects the best eligible option.
+3. AI presents the equipment, availability, evidence, conditions, and proposed rental summary.
+4. Human approval and customer acceptance occur before rental confirmation.
+
+Automatic selection is a proposal, not equipment allocation or reservation confirmation. Ambiguous requirements still require clarification. An option pending maintenance or hold release may be presented provisionally but cannot be represented as Ready to Rent.
+
+For the current read-only demo, the final gate is an illustrative approval and acceptance handoff. Actual reservation confirmation remains part of the reservation follow-up.
+
+This supersedes earlier requirements in this increment that made Customer Service manually select equipment. Existing workflow documentation must be reconciled during implementation. Human approval, certification, permitted-delay authorization, and hold-release gates remain in force.
+
 ## PR 17 working agreement
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
@@ -279,6 +295,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
 - [ ] Validate the approved presentation with normal and exception scenario walkthroughs.
 - [ ] Implement the six presentation elements with separate current readiness and requested-period availability.
+- [ ] Implement automatic proposal selection from deterministic eligibility/ranking and AI presentation through the final approval/acceptance gate.
+- [ ] Test automatic proposals, provisional options, ambiguous requirements, and prevention of allocation or confirmation before approval.
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
 - [ ] Implement staff-authority and qualification checks for human decisions.
 - [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
