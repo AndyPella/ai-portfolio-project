@@ -240,6 +240,23 @@ Reservation creation is a requested future capability. This PR's current impleme
 
 Follow-up questions include reservation lifecycle and statuses, allocation/commitment rules, advance-booking horizon, future usage and service projections, and revalidation as pickup approaches. These are pending requirements, not approved detailed policies.
 
+## Approved decision presentation
+
+Approved on 2026-10-09. Each equipment result must show:
+
+| Element | Staff-facing content |
+|---|---|
+| Current readiness | Verified equipment status and active holds |
+| Requested-period availability | Rental outcome or future forecast, with conditions |
+| Rule findings | Safety, maintenance, warranty, and reservation evidence |
+| AI explanation | Plain-language summary grounded in the rule findings |
+| Required human action | Required actor, decision/action, and review status |
+| Decision history | Recorded approvals, completed work, releases, and reevaluation |
+
+Current readiness and future availability must always appear separately. Potentially available by pickup must not be presented as ready now. Unknown or missing evidence must remain explicit. AI explanation cannot replace the authoritative rule result.
+
+Validate this presentation against one normal scenario and one exception scenario before implementation. Implementation and scenario walkthrough remain pending.
+
 ## PR 17 working agreement
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
@@ -260,6 +277,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Return structured outcomes, reason codes, evidence, conditions, and required actions.
 - [ ] Test normal readiness, failed safety, incomplete maintenance, reservations, holds, full outages, missing policy/warranty, allowed delay, exceeded delay, and mandatory service stops.
 - [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
+- [ ] Validate the approved presentation with normal and exception scenario walkthroughs.
+- [ ] Implement the six presentation elements with separate current readiness and requested-period availability.
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
 - [ ] Implement staff-authority and qualification checks for human decisions.
 - [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
