@@ -2,7 +2,7 @@
 
 - Date: 2026-10-08
 - Status: Agreed requirements captured for PR review; implementation pending
-- Applies to: Northstar Ridge Equipment Group, read-only Rental Availability
+- Applies to: Northstar Ridge Equipment Group, Rental Availability and simulated Customer Service workflow
 - Baseline reviewed: main at 550ea4bb8a0551eb80e084e5bf4c86d9aa46c5fb
 
 ## Ready to Rent
@@ -27,7 +27,7 @@ Equipment Ready remains the independent operational-readiness result. Rental Rea
 | Missing or contradictory evidence | Human Review Required; readiness cannot be confirmed |
 | Customer declines permissible planned work or interruption | Reject this option and evaluate alternatives |
 
-Mock customer information remains display-only. Explicitly gathered request requirements govern suitability; do not silently activate customer-record restrictions.
+Customer identity, required billing verification, and required insurance verification are explicit Customer Service checks using sample records. Equipment eligibility remains separate from customer eligibility. Do not infer additional restrictions from mock records.
 
 ## Operational Failure
 
@@ -267,9 +267,9 @@ Equipment selection is not a mandatory human step:
 3. AI presents the equipment, availability, evidence, conditions, and proposed rental summary.
 4. Human approval and customer acceptance occur before rental confirmation.
 
-Automatic selection is a proposal, not equipment allocation or reservation confirmation. Ambiguous requirements still require clarification. An option pending maintenance or hold release may be presented provisionally but cannot be represented as Ready to Rent.
+Automatic selection starts as a proposal. The approved Customer Service simulation below adds temporary allocation after qualifying selection, before final acceptance; it does not authorize production reservation writes. Ambiguous requirements still require clarification. An option pending maintenance or hold release may be presented provisionally but cannot be represented as Ready to Rent.
 
-For the current read-only demo, the final gate is an illustrative approval and acceptance handoff. Actual reservation confirmation remains part of the reservation follow-up.
+For the demo, the final gate is simulated staff approval and customer acceptance with allocation state transitions. Actual production reservation confirmation remains part of the reservation follow-up.
 
 This supersedes earlier requirements in this increment that made Customer Service manually select equipment. Existing workflow documentation must be reconciled during implementation. Human approval, certification, permitted-delay authorization, and hold-release gates remain in force.
 
@@ -311,9 +311,69 @@ Delivering a replacement and collecting the original unit can satisfy a service 
 
 The original unit cannot operate beyond its mandatory service point. AI may present the confirmed swap plan through approval and acceptance; it cannot invent transport availability or release equipment controls.
 
-Working cost assumption: the swap adds no charge to the customer. This is provisional, not a settled cost policy. Example only after plan confirmation: "We can cover the extended rental by delivering a replacement and collecting this unit before service is due, at no additional charge."
+Working cost assumption, clarified by the user: no additional pickup or delivery charge is applied for the replacement swap in the demo. The agreed rental charge still applies. This is provisional, not a settled transport cost policy. Example only after plan confirmation: "A replacement swap can cover the rental, with no additional pickup or delivery charge."
 
 The swap is an accepted planning requirement. The current read-only increment may evaluate/present it; actual dispatch, pickup, delivery, reservation writes, and rental execution require separately defined implementation scope.
+
+
+## Approved Customer Service workflow — 2026-10-09
+
+All eight Customer Service walkthroughs were reviewed individually and accepted. These are illustrative requirements walkthroughs, not executed software tests. This section supersedes earlier read-only wording only for the approved demo simulation; production CRM, booking, dispatch, and rental execution remain outside scope.
+
+### Intake and customer checks
+
+Capture equipment type/capabilities, requested pickup/return dates and times, branch/site, intended use, and projected operating hours when relevant. Capture renter name, company name for company rentals, customer identity, billing information/contact/address, delivery address, primary contact and phone/email, pickup/return contact and responsibilities, and insurance verification for on-site use and pickup/return transport.
+
+Every request must check customer identity:
+- Existing customer: confirm the match and rental-specific details, then proceed.
+- New customer: apply the existing new-customer rules and workflow; building registration is outside this demo.
+- Uncertain match: resolve it before proceeding; do not create a duplicate automatically.
+
+Enter shared intake once and reuse it for both the customer profile process and rental agreement. The profile can be completed in parallel while a qualifying equipment allocation protects the requested period. Required customer, billing, and insurance checks must pass before final acceptance. Use sample verification states in the demo; substantive billing/insurance policies are not newly defined here.
+
+Capture delivery/pickup notes and special instructions, including access, gates, arrival contact, timing windows, and loading/unloading requirements. Carry them into the agreement and handoff; reassess availability/logistics if they affect feasibility or timing.
+
+### Proposal and final gate
+
+Present customer/company and setup status; rental, billing, and pickup contacts; automatically proposed equipment and capabilities; dates/use/hours; logistics and notes; readiness and requested-period availability; billing/insurance verification status; customer-facing service, downtime, restrictions, or replacement conditions; and the next required action.
+
+AI prepares and presents through approval and acceptance. Customer Service reviews and approves the proposal and records customer acceptance. Recheck current eligibility at final acceptance. Pending mandatory checks block confirmation. Customer acceptance cannot waive safety, maintenance, warranty, or operational holds.
+
+### Temporary allocation lifecycle
+
+- Create a simulated temporary allocation after qualifying selection, protecting the requested equipment period from competing bookings while customer setup/agreement preparation proceeds.
+- Lifespan is four hours from creation. Temporary allocation does not certify safety or bypass any eligibility rule.
+- Agreement accepted before expiry, after all gates pass: convert to confirmed allocation without releasing the assignment.
+- Agreement canceled before acceptance: cancel the draft and release the temporary allocation; retain customer details and decision history.
+- Four hours elapsed without acceptance: expire and release competition protection; preserve customer/profile data, draft agreement, and special instructions.
+- After expiry, reevaluate availability and readiness and obtain a new temporary allocation with a new four-hour lifespan before acceptance.
+- Reevaluate on relevant equipment, request, or plan changes. New blockers prevent acceptance even while temporarily allocated.
+- Replacement plans protect both units for their respective rental segments. Moving to an approved replacement releases the original assignment and protects the replacement; confirmation preserves the qualifying assignments.
+- An allocation confirmed before expiry is not released by the temporary expiry timer.
+- Cancellation after confirmation follows a separate rental cancellation process still to be defined.
+
+Use recorded creation/expiry times in staff responses. Do not imply that temporary allocation guarantees readiness.
+
+### Callback workflow
+
+When no qualifying ready or confirmed conditional option exists, offer a callback after authorized Mechanic or Manager review. Record customer contact, agreed callback time, request/equipment, pending question, deterministic reviewer, Customer Service owner, and review result. Preserve holds until authorized release and reevaluate after resolution.
+
+Keep the callback open until Customer Service records the customer update. If review is unfinished at the agreed time, provide a status update without promising equipment. If equipment subsequently qualifies, create the four-hour temporary allocation while completing the customer interaction. Use sample records; automated calls and notifications are outside this demo.
+
+### Accepted Customer Service walkthroughs
+
+| Test | Scenario | Accepted behavior |
+|---|---|---|
+| 1 | Existing customer, ready equipment | Confirm customer and rental-specific details, required billing/insurance checks and logistics; automatically propose equipment; staff approves and customer accepts; hand off to existing rental process. |
+| 2 | New customer setup in parallel | Reuse intake for profile and agreement; apply existing new-customer rules; protect qualifying equipment through a four-hour temporary allocation; required checks still gate acceptance. |
+| 3 | No qualifying unit; callback | Route unresolved hold review to approved authority; record callback ownership/time; keep holds active. After verified work/release, reevaluate, temporarily allocate qualifying equipment, and complete remaining gates. |
+| 4 | Temporary allocation expires | Release protection at four hours; keep customer details, draft and notes. Recheck and create a new allocation before acceptance; offer alternatives/callback if no longer qualifying. |
+| 5 | Safety issue during allocation | Place safety hold and block acceptance; retain draft; evaluate qualifying alternatives. Moving assignment protects replacement and releases original allocation, not its safety hold. Otherwise offer callback; repair forecast does not establish readiness. |
+| 6 | Required billing or insurance verification pending | Preparation continues but acceptance/confirmed conversion is blocked. Verification passing within allocation window allows final review/acceptance; after expiry recheck availability. Failed verification requires resolution. |
+| 7 | Customer-facing service/replacement conditions | Present confirmed swap timing, recorded downtime and instructions; record customer acceptance and protect both rental segments. If declined, evaluate a full-period alternative, revised dates or callback. Material plan changes require reevaluation and renewed acceptance. No additional swap pickup/delivery charge in demo; agreed rental charge applies. |
+| 8 | Accept, cancel, or accept after expiry | Recheck eligibility and record staff approval/customer acceptance before confirmed conversion preserving assignment. Pre-acceptance cancellation releases temporary allocation. Expired allocation requires recheck/new allocation. Post-confirmation cancellation remains follow-up. |
+
+Brief staff responses should show the actionable result, outstanding check, and recorded expiry or completion timing. Supporting evidence remains accessible. Internal approved delays without customer impact remain staff detail; customer-facing downtime/restrictions/swaps must be disclosed.
 
 ## PR 17 working agreement
 
@@ -342,7 +402,7 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Verify the eight accepted paths with executable tests after implementation.
 - [ ] Implement the six presentation elements with separate current readiness and requested-period availability.
 - [ ] Implement automatic proposal selection from deterministic eligibility/ranking and AI presentation through the final approval/acceptance gate.
-- [ ] Test automatic proposals, provisional options, ambiguous requirements, and prevention of allocation or confirmation before approval.
+- [ ] Test automatic proposals, provisional options, ambiguous requirements, temporary allocation after qualifying selection, and prevention of confirmation before all approval/acceptance gates.
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
 - [ ] Implement staff-authority and qualification checks for human decisions.
 - [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
@@ -355,21 +415,32 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Run lint, typecheck, tests, build, and relevant interface verification.
 - [ ] Capture a short end-to-end demonstration and update the checkpoint.
 
+- [x] Validate Customer Service requirements through eight accepted discussion walkthroughs (2026-10-09); executable tests remain pending.
+- [ ] Implement sample existing/new customer routing, shared intake, verification gates, and proposal summary without building registration.
+- [ ] Implement delivery/pickup notes and feasibility reassessment.
+- [ ] Implement simulated four-hour temporary allocation, confirmed conversion, pre-acceptance cancellation, expiry, and reacquisition after recheck.
+- [ ] Implement callback sample records, ownership, agreed update time, review result and closure.
+- [ ] Test Customer Service walkthroughs, changed readiness during allocation, customer-impact acceptance and both-unit replacement protection.
+- [ ] Reconcile superseded read-only/allocation boundaries across existing architecture documents.
+
 ## Follow-up checklist
 
 - [ ] Revisit internal service-delay detail versus customer disclosure after the Customer Service workflow is complete.
-- [ ] Review replacement-swap costs; no added customer charge is currently a working assumption.
+- [ ] Review replacement-swap transport costs; no additional pickup or delivery charge is the demo assumption, while the agreed rental charge applies.
 - [ ] Define detailed replacement logistics, approvals, and execution scope before adding dispatch or rental writes.
 
 - [ ] Work through reservation requirements for days, weeks, and months in advance, including reservation creation scope and the up-to-five-day in-time classification.
+
+- [ ] Define cancellation after confirmed acceptance.
 
 ## Scope and checklist status
 
 Item 1 (repository baseline review) is complete; tests were not rerun during that review.
 Item 2 (complete equipment-readiness workflow demonstration) remains in progress.
-Item 3 responsibility map, staff authorities, routine hold release, and availability-forecast requirements are accepted and recorded; implementation and demonstration remain pending.
+Item 3 responsibility map, staff authorities, review routing, hold release, forecast, presentation, and Customer Service workflow requirements are accepted. Eight readiness and eight Customer Service discussion walkthroughs are complete; implementation and demonstration remain pending.
+Items 4 (portfolio evidence) and 5 (validation/checkpoint) remain pending.
 
-This change documents requirements only. It does not change runtime code, data, readiness outcomes, or service schedules. Reservations remain read-only. CRM, rental execution, transfers, procurement, and broad scheduling remain outside scope.
+This change documents requirements only. It does not change runtime code, data, readiness outcomes, or service schedules. Production reservations remain read-only; simulated temporary/confirmed allocation states are now approved demo scope. Building CRM/new-customer registration, production rental execution, transfers, procurement, and broad scheduling remain outside scope.
 
 ## Related references
 
