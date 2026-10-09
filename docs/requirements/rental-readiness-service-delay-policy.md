@@ -212,6 +212,34 @@ AI may explain and prepare the review request. Deterministic rules select the re
 
 For the customer waiting on the phone, show what is known, what is pending, who must act, and any recorded expected completion time. Missing information remains explicit; AI must not invent an answer or completion estimate.
 
+## Approved review completion and reevaluation
+
+Approved on 2026-10-09.
+
+| Review result | System response |
+|---|---|
+| Mechanic confirms feasible completion plan | Update availability forecast; keep hold active |
+| Work complete and routine release requirements pass | Record authorized release, then recalculate readiness and availability |
+| Manager approves permitted delay | Record approval, limits, conditions; recalculate rental eligibility |
+| Request denied or work cannot finish in time | Mark option unavailable and present alternatives |
+| Review incomplete | Keep availability unconfirmed and identify outstanding action |
+
+A recorded decision triggers reevaluation; it does not directly overwrite Ready to Rent. Changes to rental dates, projected operating hours, service plans, or relevant equipment evidence require reevaluation of whether earlier decisions still apply.
+
+The loop is request → review → decision → reevaluation → customer response.
+
+## Reservation planning follow-up
+
+Recorded on 2026-10-09. Return to reservations as an explicit follow-up: the desired capability is to reserve equipment and understand availability on a future timeline, including requests days, weeks, or months before pickup.
+
+In-time reservations are requests made up to five days before pickup. This is a lead-time classification, not an availability horizon or a replacement for the existing three-day pre-rental work-review window or 24-hour completion buffer.
+
+Future availability must account for the requested rental period and relevant commitments, service projections, buffers, and holds rather than evaluating only immediate availability. Future forecasts must remain separate from current verified readiness.
+
+Reservation creation is a requested future capability. This PR's current implementation increment remains read-only; reservation writes require a separately defined and reviewed scope before implementation. Do not silently apply the existing 30-day alternative-date search horizon as a maximum advance-booking horizon.
+
+Follow-up questions include reservation lifecycle and statuses, allocation/commitment rules, advance-booking horizon, future usage and service projections, and revalidation as pickup approaches. These are pending requirements, not approved detailed policies.
+
 ## PR 17 working agreement
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
@@ -235,12 +263,18 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
 - [ ] Implement staff-authority and qualification checks for human decisions.
 - [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
+- [ ] Implement review-completion reevaluation and reassess prior decisions when relevant inputs change.
+- [ ] Test confirmed plans retaining holds, authorized release, permitted delay decisions, denial, incomplete review, and changed inputs.
 - [ ] Test correct reviewer routing, active blockers during review, and missing completion estimates.
 - [ ] Implement the separate Customer Service availability forecast without bypassing current readiness or holds.
 - [ ] Test unauthorized release, multiple holds, uncertain completion, feasible forecasts, and work that cannot finish in time.
 - [ ] Complete the scoped Mechanic resolution/human-release path and recorded outcome.
 - [ ] Run lint, typecheck, tests, build, and relevant interface verification.
 - [ ] Capture a short end-to-end demonstration and update the checkpoint.
+
+## Follow-up checklist
+
+- [ ] Work through reservation requirements for days, weeks, and months in advance, including reservation creation scope and the up-to-five-day in-time classification.
 
 ## Scope and checklist status
 
