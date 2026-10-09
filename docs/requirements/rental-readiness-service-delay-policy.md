@@ -50,7 +50,7 @@ Safety-critical and operationally critical service does not permit operation bey
 
 Non-safety, noncritical service may be delayed only within an established allowance. Unknown classification, missing allowance, or uncertain warranty relevance requires human review; human review is not permission to waive a mandatory limit.
 
-Customer acknowledgement is required for permitted planned work or interruption and cannot extend service limits.
+Customer acknowledgement is required before final handoff for work, interruptions, swaps, or restrictions that affect the customer. An approved internal service delay with no customer impact does not require customer disclosure or acknowledgement. Acceptance cannot extend service limits.
 
 ## Simple system-group delay gates
 
@@ -100,8 +100,8 @@ Exact schema names, policy storage, and migration behavior are implementation de
 
 ## Outcomes
 
-- Rental Ready: all current safety and maintenance prerequisites pass; no request conflict or required conditional plan.
-- Rental Ready with Conditions: prerequisites pass and a permitted future service plan or approved noncritical delay is established and acknowledged.
+- Rental Ready: all current safety and maintenance prerequisites pass; no request conflict or customer-facing conditional plan. An approved internal service delay that satisfies all applicable limits and has no customer impact follows this outcome.
+- Rental Ready with Conditions: prerequisites pass and a permitted future service or replacement plan with customer impact is established. It may be presented before acknowledgement; recorded customer acceptance gates final handoff.
 - Not Available: a known period conflict or mandatory limit cannot be satisfied.
 - Remediation Required: identified work or evidence must be completed before readiness can be established.
 - Human Review Required: classification, policy, warranty, or evidence is missing or contradictory.
@@ -255,7 +255,7 @@ Approved on 2026-10-09. Each equipment result must show:
 
 Current readiness and future availability must always appear separately. Potentially available by pickup must not be presented as ready now. Unknown or missing evidence must remain explicit. AI explanation cannot replace the authoritative rule result.
 
-Validate this presentation against one normal scenario and one exception scenario before implementation. Implementation and scenario walkthrough remain pending.
+Eight requirements walkthroughs were accepted on 2026-10-09, as recorded below. These are discussion-based validation, not executed software tests. Runtime implementation and demonstration remain pending.
 
 ## Approved automatic equipment selection and final human gate
 
@@ -272,6 +272,48 @@ Automatic selection is a proposal, not equipment allocation or reservation confi
 For the current read-only demo, the final gate is an illustrative approval and acceptance handoff. Actual reservation confirmation remains part of the reservation follow-up.
 
 This supersedes earlier requirements in this increment that made Customer Service manually select equipment. Existing workflow documentation must be reconciled during implementation. Human approval, certification, permitted-delay authorization, and hold-release gates remain in force.
+
+## Accepted requirements walkthroughs — 2026-10-09
+
+All eight walkthroughs were reviewed individually and accepted by the user. These decisions refine earlier wording where it conflicts; they do not constitute executed software tests or runtime implementation.
+
+| Test | Scenario | Accepted behavior |
+|---|---|---|
+| 1 | Ready unit versus a unit awaiting maintenance | Automatically propose the qualifying ready unit ahead of a pending-work option. Present through staff approval and customer acceptance. |
+| 2 | No ready unit; confirmed maintenance completion before pickup | Present potentially available, pending completion and authorized release. Include the recorded projected completion date/time; do not invent an estimate. Reevaluate after completion and release. |
+| 3 | No ready or confirmed conditional unit; uncertain hold resolution | No qualifying availability for the requested type and dates. Exclude unresolved holds from rental selection. Offer a callback after Mechanic or Manager review under approved authority, or customer-agreed changes to dates/location/requirements. Promise an update, not availability. Keep holds active until properly released, then reevaluate. |
+| 4 | Service due during rental; approved delay meets all rules | Treat as Test 1, Rental Ready, when all policy/warranty limits pass and there is no customer impact. Service detail remains available to Customer Service; no customer disclosure is needed solely for the internal delay. Disclose any restriction or interruption affecting the customer. |
+| 5 | Service cannot be delayed | A confirmed plan must satisfy the mandatory limit. Pre-pickup work follows Test 2 then Test 1; service during rental requires disclosure and customer acceptance of interruption. No confirmed plan follows Test 3. No operation past the mandatory limit until service is verified complete. |
+| 6 | Warranty prevents an otherwise permitted delay | Warranty requirements take precedence over general company delay allowances. Manager cannot waive them. Use the established pre-pickup, service-during-rental, or unavailable/callback paths. |
+| 7 | Incomplete or conflicting repair/safety/release records | Exclude the unit until evidence and authorized release support readiness. Repair completion alone does not prove required reinspection passed. Known missing inspection requires completing/recording it; contradictory evidence or exception holds require Manager review with Mechanic support. Reevaluate after resolution; use Test 3 callback when no other qualifying option exists. |
+| 8 | Dates or projected usage change | Automatically reevaluate the full revised request, conflicts, buffers, service limits, and applicability of prior approvals. A confirmed replacement swap can support the rental when it satisfies the requirements below. |
+
+### Brief AI responses and staff detail
+
+Default AI responses must be brief and action-focused so Customer Service can answer quickly. Keep supporting rule evidence and service detail accessible in the staff presentation.
+
+- Ready: "This unit is available for your requested dates."
+- Pending pre-pickup work: "Maintenance is expected to finish [recorded date/time], before pickup. Availability remains pending completion and mechanic release."
+- No qualifying unit: "No unit is currently available. We can check whether the hold can be resolved and call you back, or check different dates or another location."
+- Approved internal delay, staff detail: "Ready for the requested dates. Service delay approved; service scheduled after return."
+- Required interruption: "This unit can cover your dates with a required [recorded duration] service stop on [recorded date/time]. Confirm customer acceptance."
+
+Examples are presentation requirements, not generated estimates. Any quoted timing or duration must come from confirmed records.
+
+### Confirmed replacement swap
+
+Delivering a replacement and collecting the original unit can satisfy a service requirement and allow the rental to proceed when:
+- Both units qualify for their respective portions of the requested rental, including safety, maintenance, capabilities, reservations, holds, service limits, and buffers.
+- The replacement is available for the remaining period.
+- Delivery, pickup, and handoff are confirmed before the original unit's mandatory service limit.
+- Any interruption or customer-facing condition is disclosed and accepted.
+- The plan, evidence, and required approvals are recorded; reevaluation supports the resulting rental proposal.
+
+The original unit cannot operate beyond its mandatory service point. AI may present the confirmed swap plan through approval and acceptance; it cannot invent transport availability or release equipment controls.
+
+Working cost assumption: the swap adds no charge to the customer. This is provisional, not a settled cost policy. Example only after plan confirmation: "We can cover the extended rental by delivering a replacement and collecting this unit before service is due, at no additional charge."
+
+The swap is an accepted planning requirement. The current read-only increment may evaluate/present it; actual dispatch, pickup, delivery, reservation writes, and rental execution require separately defined implementation scope.
 
 ## PR 17 working agreement
 
@@ -293,7 +335,11 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Return structured outcomes, reason codes, evidence, conditions, and required actions.
 - [ ] Test normal readiness, failed safety, incomplete maintenance, reservations, holds, full outages, missing policy/warranty, allowed delay, exceeded delay, and mandatory service stops.
 - [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
-- [ ] Validate the approved presentation with normal and exception scenario walkthroughs.
+- [x] Validate requirements and presentation through eight accepted discussion walkthroughs (2026-10-09); software tests remain pending.
+- [ ] Implement brief AI responses with accessible staff evidence and recorded projected completion times.
+- [ ] Implement no-availability callback/review handling without implying rental eligibility or releasing holds.
+- [ ] Evaluate confirmed replacement plans across both units and transport timing within the read-only scope.
+- [ ] Verify the eight accepted paths with executable tests after implementation.
 - [ ] Implement the six presentation elements with separate current readiness and requested-period availability.
 - [ ] Implement automatic proposal selection from deterministic eligibility/ranking and AI presentation through the final approval/acceptance gate.
 - [ ] Test automatic proposals, provisional options, ambiguous requirements, and prevention of allocation or confirmation before approval.
@@ -310,6 +356,10 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Capture a short end-to-end demonstration and update the checkpoint.
 
 ## Follow-up checklist
+
+- [ ] Revisit internal service-delay detail versus customer disclosure after the Customer Service workflow is complete.
+- [ ] Review replacement-swap costs; no added customer charge is currently a working assumption.
+- [ ] Define detailed replacement logistics, approvals, and execution scope before adding dispatch or rental writes.
 
 - [ ] Work through reservation requirements for days, weeks, and months in advance, including reservation creation scope and the up-to-five-day in-time classification.
 
