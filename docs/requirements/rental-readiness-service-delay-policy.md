@@ -112,7 +112,7 @@ Final precedence for multiple simultaneous findings remains to be specified. Pre
 
 No numerical delay allowance has been approved. Do not infer manufacturer policies from the fictional dataset or service names.
 
-- Define a small set of fictional, explicitly labeled noncritical group allowances, in days and/or operating hours, ; Manager approval requires a Qualified Mechanic assessment.
+- Define a small set of fictional, explicitly labeled noncritical group allowances, in days and/or operating hours; Manager approval requires a Qualified Mechanic assessment.
 - Decide how concurrent time/hour limits apply.
 - Confirm task-level classifications for periodic engine, hydraulic, aerial, generator, telehandler, and battery work.
 - Resolve the existing 24-hour pre-rental completion buffer: conditional timing risk versus absolute gate.
@@ -195,6 +195,23 @@ A confirmed plan supports a forecast only. It does not mark work complete, relea
 
 The forecast is a separate presentation result, not an automatic replacement for Equipment Readiness or the existing availability outcome contract. Exact schema mapping remains an implementation decision.
 
+## Approved review-routing rule
+
+Approved on 2026-10-09.
+
+| Situation | System action | Staff involvement |
+|---|---|---|
+| Records complete and all rules pass | Return Rental Ready with evidence | Customer Service selects equipment |
+| Required work has a confirmed, feasible completion plan | Return potentially available, pending work and release | Mechanic verifies completion and releases the hold within approved authority |
+| Work timing, parts, technician, or technical classification uncertain | Identify missing confirmation | Qualified Mechanic assesses and confirms |
+| Noncritical delay permitted by established policy | Show permitted limit and rental impact | Mechanic assesses; Manager approves delay |
+| Conflicting evidence or exceptional hold release | Keep readiness unconfirmed and show conflict | Manager resolves with Mechanic support |
+| Known conflict or mandatory limit prevents rental | Return Not Available and evaluate alternatives | Customer Service chooses an alternative |
+
+AI may explain and prepare the review request. Deterministic rules select the required reviewer and keep the blocker active until a recorded decision satisfies policy. Routing does not expand the approved staff authorities.
+
+For the customer waiting on the phone, show what is known, what is pending, who must act, and any recorded expected completion time. Missing information remains explicit; AI must not invent an answer or completion estimate.
+
 ## PR 17 working agreement
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
@@ -217,6 +234,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
 - [ ] Implement staff-authority and qualification checks for human decisions.
+- [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
+- [ ] Test correct reviewer routing, active blockers during review, and missing completion estimates.
 - [ ] Implement the separate Customer Service availability forecast without bypassing current readiness or holds.
 - [ ] Test unauthorized release, multiple holds, uncertain completion, feasible forecasts, and work that cannot finish in time.
 - [ ] Complete the scoped Mechanic resolution/human-release path and recorded outcome.
