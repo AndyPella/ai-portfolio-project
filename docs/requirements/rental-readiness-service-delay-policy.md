@@ -112,7 +112,7 @@ Final precedence for multiple simultaneous findings remains to be specified. Pre
 
 No numerical delay allowance has been approved. Do not infer manufacturer policies from the fictional dataset or service names.
 
-- Define a small set of fictional, explicitly labeled noncritical group allowances, in days and/or operating hours, and their approval authority.
+- Define a small set of fictional, explicitly labeled noncritical group allowances, in days and/or operating hours, ; Manager approval requires a Qualified Mechanic assessment.
 - Decide how concurrent time/hour limits apply.
 - Confirm task-level classifications for periodic engine, hydraulic, aerial, generator, telehandler, and battery work.
 - Resolve the existing 24-hour pre-rental completion buffer: conditional timing risk versus absolute gate.
@@ -142,7 +142,58 @@ AI interprets and explains. Deterministic rules calculate eligibility and enforc
 
 Each human decision must record actor, timestamp, Equipment ID, decision, reason, and supporting evidence. For service delays, the system first determines whether policy permits a delay; an authorized employee approves its use for the rental. Missing policy requires review and cannot become automatic approval.
 
-Specific staff-role authorities for delay approval, certification, exception resolution, and hold release remain unresolved. No authority assignment is implied by this map.
+## Approved staff authorities
+
+Approved on 2026-10-09. Qualifications must match the task; a role label alone does not establish certification.
+
+| Decision or action | Authority | Boundary |
+|---|---|---|
+| Confirm rental needs and select equipment | Customer Service | Select only options permitted by evaluated rules |
+| Record acceptance of conditions | Customer Service | Acceptance cannot waive service limits or holds |
+| Place an operational hold | Mechanic or Manager | Record reason and supporting evidence |
+| Assess defects and classify service criticality | Qualified Mechanic | Follow established policy; escalate uncertain classifications |
+| Complete maintenance or repair | Qualified Mechanic | Record work and completion evidence |
+| Certify required safety checks | Appropriately qualified inspector or Mechanic | Qualifications must match the inspection |
+| Approve noncritical service delay | Manager | Requires Mechanic assessment and compliance with policy and warranty limits |
+| Release routine maintenance hold | Qualified Mechanic | Required work verified and readiness recalculation passes |
+| Resolve contradictory records or exceptional holds | Manager, supported by Mechanic | Correct or reconcile evidence before release |
+
+The Mechanic establishes technical eligibility; the Manager authorizes permitted service delays; Customer Service manages rental selection and acknowledgement. General Staff may view status and report concerns, but cannot certify work, approve delays, or release holds.
+
+## Routine hold release
+
+Agreed on 2026-10-08. Routine release removes a hold for a known inspection, maintenance, or repair task after its predefined completion requirements are satisfied.
+
+A qualified Mechanic may release the hold only when:
+- Work falls within their qualifications and authority.
+- Required work is complete and evidence recorded.
+- Required safety checks or reinspection have passed.
+- No unresolved blocking defect or conflicting evidence remains.
+- The deterministic readiness check passes.
+- No separate hold remains requiring another authority.
+
+Record Mechanic identity, timestamp, Equipment ID, hold reference, and completion evidence. Releasing one hold does not release another.
+
+Manager review is required for exceptions, service-delay approval, uncertain evidence, or a hold reserved for Manager authority. Manager approval cannot waive required safety checks or mandatory service limits.
+
+Example: completed scheduled maintenance with passed required checks permits routine release. A request to rent before necessary maintenance is complete does not.
+
+## Availability forecast while the customer waits
+
+Agreed on 2026-10-09. Customer Service needs a prompt answer before pending work and hold release are complete. Keep current readiness separate from a forecast for the requested start.
+
+| Situation | Customer Service response |
+|---|---|
+| All checks pass and no conflicts exist | Rental Ready |
+| Hold exists, but required work has a confirmed completion plan feasible for the requested start | Potentially available—pending work and release |
+| Timing, parts, technician, or release requirements are uncertain | Availability cannot yet be confirmed |
+| Work cannot finish in time | Not Available; offer alternatives |
+
+Immediately show outstanding work, expected completion, confirmation status, and required release authority. Derive the first response from existing records; involve the Mechanic or Manager when confirmation is missing.
+
+A confirmed plan supports a forecast only. It does not mark work complete, release a hold, certify safety, establish Ready to Rent, allocate equipment, or confirm a reservation. Known reservation conflicts and other blockers must remain visible and prevent an unsupported positive forecast.
+
+The forecast is a separate presentation result, not an automatic replacement for Equipment Readiness or the existing availability outcome contract. Exact schema mapping remains an implementation decision.
 
 ## PR 17 working agreement
 
@@ -165,6 +216,9 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Test normal readiness, failed safety, incomplete maintenance, reservations, holds, full outages, missing policy/warranty, allowed delay, exceeded delay, and mandatory service stops.
 - [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
+- [ ] Implement staff-authority and qualification checks for human decisions.
+- [ ] Implement the separate Customer Service availability forecast without bypassing current readiness or holds.
+- [ ] Test unauthorized release, multiple holds, uncertain completion, feasible forecasts, and work that cannot finish in time.
 - [ ] Complete the scoped Mechanic resolution/human-release path and recorded outcome.
 - [ ] Run lint, typecheck, tests, build, and relevant interface verification.
 - [ ] Capture a short end-to-end demonstration and update the checkpoint.
@@ -173,7 +227,7 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 
 Item 1 (repository baseline review) is complete; tests were not rerun during that review.
 Item 2 (complete equipment-readiness workflow demonstration) remains in progress.
-Item 3 responsibility map is accepted and recorded; staff-role authorities and implementation remain pending.
+Item 3 responsibility map, staff authorities, routine hold release, and availability-forecast requirements are accepted and recorded; implementation and demonstration remain pending.
 
 This change documents requirements only. It does not change runtime code, data, readiness outcomes, or service schedules. Reservations remain read-only. CRM, rental execution, transfers, procurement, and broad scheduling remain outside scope.
 
