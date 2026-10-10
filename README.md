@@ -29,7 +29,9 @@ The artifact being demonstrated is the product-development process, not just the
 
 ## Current status
 
-This repository is a portfolio case study and working prototype foundation. The current application provides a responsive public-facing base, structured data, workflow documentation, and automated validation tests. The Customer Service, Mechanic, and Manager workflow paths are documented and staged for continued UI implementation.
+The application now implements rental eligibility and an in-memory Customer Service workflow: automatic proposals, explicit customer checks, four-hour protection, approval/acceptance, expiry, callbacks and qualified maintenance/inspection/hold release. Manager decisions enforce policy and warranty limits. Current readiness, requested-period forecasts, evidence and decision history remain separate.
+
+Brief summaries are deterministic templates, visibly labeled; live AI interpretation remains a follow-up. Demo roles are sample identities, not production authentication. No production booking, CRM, rental fulfillment or dispatch calls are made.
 
 The project is intentionally focused on the quality of the product thinking, workflow structure, implementation approach, and validation evidence behind the prototype rather than presenting an incomplete UI as a finished production product.
 
@@ -47,13 +49,13 @@ This project uses fictional company data and synthetic operational scenarios. It
 
 Prerequisites:
 
-- Node.js 20.9 or later
+- Node.js 22.6 or later (tests use experimental TypeScript stripping; verified on Node 24.19.0)
 - npm 10 or later
 
 Install dependencies and start the development server:
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -82,3 +84,19 @@ Useful entry points:
 - [Architecture](docs/architecture)
 - [Decision records](docs/decisions)
 - [Testing evidence](docs/testing)
+
+
+## Rental workflow demonstration
+
+Open Customer Service below the role cards. The fictional clock begins September 5, 2026 to match the source scenarios; it advances while the page is open and can jump four hours for expiry testing. Enter a reason/evidence reference before recording actions. Scenario 1 demonstrates approval/acceptance; scenario 2 requires qualified inspection/release; scenario 4 requires customer-facing service acceptance; scenario 7 has a separate site-document check. Changes stay in memory and reload resets the demo.
+
+See the [implementation checkpoint](docs/checkpoints/2026-10-10-rental-workflow-implementation.md) for the full demonstration and validation matrix.
+
+Optional browser verification (after a successful build):
+
+```bash
+npx playwright install chromium
+npm run test:ui
+```
+
+The browser smoke test covers approval/acceptance, confirmed timer retention, service decline, qualified inspection/release, expiry, customer verification, desktop/mobile overflow and browser errors. `BROWSER_EXECUTABLE` and `BROWSER_ARGS` support an installed headless browser; `UI_SCREENSHOT_DIR` optionally captures local verification images.

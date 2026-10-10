@@ -57,3 +57,12 @@ The Equipment Readiness engine validates this snapshot through the established
 validator before evaluation. Unlike snapshot validation, readiness time rules require
 an explicit caller-supplied as-of date; they never use the system clock. The engine
 does not mutate the snapshot or connect to the private Sheet.
+
+
+## PR 17 supplemental source mapping
+
+The core schema remains 1.0; the additive `rental_workflow` groups are required by `validateRentalDataset` at the demo entry point. Delay Policies, Maintenance Controls, Demo Staff, Operational Holds, Customer Checks, Rental Requests and Reservation Timing map directly to the corresponding nested arrays. Policy versions use `demo-1`. Request usage/intake and staff qualification arrays are JSON cells in the editable source. Normalize them to objects/arrays, preserve booleans/numbers, and normalize absent control limits to null.
+
+Seeded periodic service names were reconciled with existing due-hour thresholds; equipment IDs, inspection/maintenance links and schedules were preserved. SCN-006 now follows the approved repair-over-review precedence while retaining contradiction evidence. SCN-007 equipment is eligible while site-document verification separately gates acceptance. The generator usage windows document 20 hours before the scheduled service and no operation during the stop; no invented exact threshold clock time is used. Its documented next-hour limit is fictional, not a manufacturer specification.
+
+Session work/inspection decisions, allocations, callbacks, acceptance and history are simulated operational records derived from the reviewed source; they do not write back to the Sheet or replace it. Tests mutate isolated clones to exercise alternative states and replacement-unit scenarios; they do not introduce a second application dataset. Future Mechanic work must reuse the shared task, policy, warranty, qualification, inspection, hold and decision references.

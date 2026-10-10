@@ -1,5 +1,7 @@
 import snapshot from "../data/northstar-ridge-demo-data.json";
 import { validateNorthstarRidgeDataset } from "../data/northstar-ridge-data";
+import RentalWorkspace from "./rental-workspace";
+import { validateRentalDataset } from "../domain/rental-validation";
 
 validateNorthstarRidgeDataset(snapshot);
 
@@ -44,7 +46,7 @@ export default function Home() {
           <div className="eyebrow"><span /> Equipment readiness</div>
           <h1 id="page-title">The right equipment.<br /><em>Ready when it matters.</em></h1>
           <p className="hero-copy">
-            Explore how Northstar Ridge teams will assess equipment status, surface
+            Explore how Northstar Ridge teams assess equipment status, surface
             operational needs, and coordinate the work that keeps the fleet moving.
           </p>
           <div className="notice" role="note">
@@ -56,26 +58,28 @@ export default function Home() {
         <section className="workflows" aria-labelledby="workflow-title">
           <div className="section-heading">
             <div><p className="section-kicker">Choose your role</p><h2 id="workflow-title">How would you like to begin?</h2></div>
-            <p>Select a workspace to preview its planned equipment-readiness workflow.</p>
+            <p>Explore Customer Service and the scoped maintenance-resolution controls below.</p>
           </div>
           <div className="card-grid">
             <article className="workflow-card">
               <div className="icon-box"><HeadsetIcon /></div>
               <div className="card-copy"><p className="card-number">Workspace 01</p><h3>Customer Service</h3><p>Find suitable equipment and review readiness in the context of a customer request.</p></div>
-              <span className="coming-soon">Coming soon</span>
-              <span className="card-link" aria-hidden="true">Enter workspace <ArrowIcon /></span>
+              <span className="coming-soon">Available</span>
+              <a className="card-link" href="#customer-service">Enter workspace <ArrowIcon /></a>
             </article>
             <article className="workflow-card">
               <div className="icon-box"><WrenchIcon /></div>
               <div className="card-copy"><p className="card-number">Workspace 02</p><h3>Mechanic</h3><p>Review required work, document service evidence, and return equipment to operation.</p></div>
-              <span className="coming-soon">Coming soon</span>
-              <span className="card-link" aria-hidden="true">Enter workspace <ArrowIcon /></span>
+              <span className="coming-soon">Scoped demo</span>
+              <a className="card-link" href="#mechanic">Review resolution controls <ArrowIcon /></a>
             </article>
           </div>
         </section>
+        <RentalWorkspace source={validateRentalDataset(snapshot)} />
       </main>
 
-      <footer><p>Northstar Ridge Equipment Group</p><p>Operational Readiness Demo · Foundation release</p></footer>
+      <footer><p>Northstar Ridge Equipment Group</p><p>Operational Readiness Demo · Rental workflow simulation</p></footer>
     </div>
   );
 }
+

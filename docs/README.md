@@ -20,9 +20,9 @@ This directory preserves the evidence used to select, design, build, test, and p
 
 - [Post-PR #13 Project Progress Checkpoint](checkpoints/2026-08-14-post-pr-13.md)
 
-## Requirements Pending Implementation
+## Rental Workflow Implementation
 
-- [Rental Readiness and Service Delay Requirements](requirements/rental-readiness-service-delay-policy.md) — October 8 agreed requirements, unresolved policy decisions, and implementation checklist; runtime implementation pending.
+- [Rental Readiness and Service Delay Requirements](requirements/rental-readiness-service-delay-policy.md) — accepted decisions, implemented controls and verification status.
 
 ## Working Dataset
 
@@ -50,3 +50,6 @@ authoritative Google Sheet → reviewed JSON snapshot → application process.
 Preserve the complete evidence here, then curate only the strongest evidence for the
 public portfolio. Do not include employer-confidential information, credentials,
 personal data, or private-resource links.
+
+
+- [Rental workflow implementation checkpoint](checkpoints/2026-10-10-rental-workflow-implementation.md) — concrete schema mapping, seeded task reconciliation, validation and demonstration steps.

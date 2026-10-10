@@ -1,7 +1,7 @@
 # Rental Readiness and Service Delay Requirements
 
 - Date: 2026-10-08
-- Status: Agreed requirements captured for PR review; implementation pending
+- Status: Approved decisions; scoped runtime controls/simulation implemented. See the 2026-10-10 checkpoint for verified evidence and remaining AI/integration work.
 - Applies to: Northstar Ridge Equipment Group, Rental Availability and simulated Customer Service workflow
 - Baseline reviewed: main at 550ea4bb8a0551eb80e084e5bf4c86d9aa46c5fb
 
@@ -158,20 +158,20 @@ Approved precedence for simultaneous findings:
 
 Retain all findings, evidence, and required actions regardless of the primary result. A confirmed repair plan may show a separate potentially-available-by-pickup forecast alongside current blocked status; it cannot replace that status.
 
-## Open policy and data decisions
+## Policy and data decisions resolved during implementation
 
 The fictional seven-day/25-operating-hour noncritical allowance is approved. Do not infer manufacturer policies from the fictional dataset or service names.
 
-- Apply the approved classification approach explicitly to each seeded task; reconcile task evidence during implementation.
-- Reconcile illustrative dataset inconsistencies, including periodic-service labels versus due-hour thresholds and corrective-work references.
-- Review the customer-restriction scenario against the display-only mock-customer boundary.
-- Decide how verified completion, operational hold release, and delay approval are represented and traced.
+- Seeded classification and qualified assessment references are explicit in the reviewed source.
+- Illustrative service names now match their existing due-hour thresholds; corrective-work references were preserved and verified.
+- Customer-restriction equipment eligibility is separate from the explicit site-document confirmation gate.
+- Shared session decisions trace technical completion, inspection, hold release and request-specific delay approval.
 
 The generator example begins at 480 hours, has service due at 500, and projects 40 rental hours. Its scheduled service date alone does not establish compliance; usage timing or an approved allowance is needed.
 
 ## Accepted responsibility map — Item 3
 
-Accepted on 2026-10-08. These are requirements; runtime implementation remains pending.
+Accepted on 2026-10-08. These are approved requirements; current implementation evidence is recorded in the checkpoint.
 
 | Workflow step | AI responsibility | Deterministic rules | Human responsibility |
 |---|---|---|---|
@@ -281,7 +281,7 @@ In-time reservations are requests made up to five days before pickup. This is a 
 
 Future availability must account for the requested rental period and relevant commitments, service projections, buffers, and holds rather than evaluating only immediate availability. Future forecasts must remain separate from current verified readiness.
 
-Reservation creation is a requested future capability. This PR's current implementation increment remains read-only; reservation writes require a separately defined and reviewed scope before implementation. Do not silently apply the existing 30-day alternative-date search horizon as a maximum advance-booking horizon.
+Reservation creation is a requested future capability. Production reservation writes require a separately defined and reviewed scope; the approved in-memory temporary/confirmed allocation simulation is implemented. Do not silently apply the existing 30-day alternative-date search horizon as a maximum advance-booking horizon.
 
 Follow-up questions include reservation lifecycle and statuses, allocation/commitment rules, advance-booking horizon, future usage and service projections, and revalidation as pickup approaches. These are pending requirements, not approved detailed policies.
 
@@ -475,51 +475,51 @@ Requirements preparation for Items 2 and 3 is complete. Concrete schema/contract
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
 
-Track implementation tasks as Pending, Implemented, or Verified, with evidence for verified status. Update the PR description and validation evidence as scope evolves. Current runtime implementation status: Pending.
+Track implementation tasks as Pending, Implemented, or Verified, with evidence for verified status. Update the PR description and validation evidence as scope evolves. Current runtime implementation status: Implemented and verified for the scoped simulation; live AI integration remains pending.
 
 Keep the PR open for review until the user explicitly authorizes merging. This agreement authorizes continued work on the PR; it does not authorize merging.
 
 ## Implementation checklist
 
-- [ ] Reconcile existing readiness/availability documents with these requirements.
+- [x] Reconcile existing readiness/availability documents with these requirements.
 - [x] Approve minimum shared record requirements, classification approach, fictional allowance and multiple-findings precedence (2026-10-10).
-- [ ] Map approved shared records to concrete schema/types and maintenance-record additions.
-- [ ] Update the editable source, reviewed JSON snapshot, types, and validator through the established data workflow.
-- [ ] Classify seeded tasks and add explicit fictional warranty and policy evidence.
-- [ ] Implement the read-only availability evaluator consuming Equipment Readiness.
-- [ ] Evaluate reservation/hold conflicts using approved two-hour preparation/return defaults, recorded longer durations, branch timezone, and adjacent protected intervals.
-- [ ] Evaluate due service, daily projected hours and specific usage timing where required, stop-operation rules, versioned policy references, delay gates, and warranty limits.
-- [ ] Return structured outcomes, reason codes, evidence, conditions, and required actions.
-- [ ] Test normal readiness, failed safety, incomplete maintenance, reservations, holds, full outages, missing policy/warranty, allowed delay, exceeded delay, and mandatory service stops.
-- [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
-- [x] Validate requirements and presentation through eight accepted discussion walkthroughs (2026-10-09); software tests remain pending.
-- [ ] Implement brief AI responses with accessible staff evidence and recorded projected completion times.
-- [ ] Implement no-availability callback/review handling without implying rental eligibility or releasing holds.
-- [ ] Evaluate confirmed replacement plans across both units and transport timing within the read-only scope.
-- [ ] Verify the eight accepted paths with executable tests after implementation.
-- [ ] Implement the six presentation elements with separate current readiness and requested-period availability.
-- [ ] Implement automatic proposal selection from deterministic eligibility/ranking and AI presentation through the final approval/acceptance gate.
-- [ ] Test automatic proposals, provisional options, ambiguous requirements, temporary allocation after qualifying selection, and prevention of confirmation before all approval/acceptance gates.
-- [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
+- [x] Map approved shared records to concrete schema/types and maintenance-record additions.
+- [x] Update the editable source, reviewed JSON snapshot, types, and validator through the established data workflow.
+- [x] Classify seeded tasks and add explicit fictional warranty and policy evidence.
+- [x] Implement the read-only availability evaluator consuming Equipment Readiness.
+- [x] Evaluate reservation/hold conflicts using approved two-hour preparation/return defaults, recorded longer durations, branch timezone, and adjacent protected intervals.
+- [x] Evaluate due service, daily projected hours and specific usage timing where required, stop-operation rules, versioned policy references, delay gates, and warranty limits.
+- [x] Return structured outcomes, reason codes, evidence, conditions, and required actions.
+- [x] Test normal readiness, failed safety, incomplete maintenance, reservations, holds, full outages, missing policy/warranty, allowed delay, exceeded delay, and mandatory service stops.
+- [x] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
+- [x] Validate requirements and presentation through eight accepted discussion walkthroughs (2026-10-09); software tests are recorded in the checkpoint.
+- [x] Implement brief grounded demo summaries with accessible staff evidence and recorded completion times (templated; live AI pending).
+- [x] Implement no-availability callback/review handling without implying rental eligibility or releasing holds.
+- [x] Evaluate confirmed replacement plans across both units and transport timing within the read-only scope.
+- [x] Verify the eight accepted paths with executable tests after implementation.
+- [x] Implement the six presentation elements with separate current readiness and requested-period availability.
+- [x] Implement automatic proposal selection from deterministic eligibility/ranking and grounded demo presentation through the final approval/acceptance gate.
+- [x] Test automatic proposals, provisional options, ambiguous requirements, temporary allocation after qualifying selection, and prevention of confirmation before all approval/acceptance gates.
+- [x] Connect Customer Service to the evidenced decision and conditional acknowledgement.
 - [x] Approve Item 3 validation criteria and sample staff identity/qualification scope (2026-10-10).
-- [ ] Implement staff-authority and qualification checks for human decisions using sample identities.
-- [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
-- [ ] Implement review-completion reevaluation and reassess prior decisions when relevant inputs change.
-- [ ] Test confirmed plans retaining holds, authorized release, permitted delay decisions, denial, incomplete review, and changed inputs.
-- [ ] Test correct reviewer routing, active blockers during review, and missing completion estimates.
-- [ ] Implement the separate Customer Service availability forecast without bypassing current readiness or holds.
-- [ ] Test unauthorized release, multiple holds, uncertain completion, feasible forecasts, and work that cannot finish in time.
-- [ ] Complete the scoped Mechanic resolution/human-release path and recorded outcome.
-- [ ] Run lint, typecheck, tests, build, and relevant interface verification.
-- [ ] Capture a short end-to-end demonstration and update the checkpoint.
+- [x] Implement staff-authority and qualification checks for human decisions using sample identities.
+- [x] Implement deterministic review routing and evidence-backed Customer Service responses.
+- [x] Implement review-completion reevaluation and reassess prior decisions when relevant inputs change.
+- [x] Test confirmed plans retaining holds, authorized release, permitted delay decisions, denial, incomplete review, and changed inputs.
+- [x] Test correct reviewer routing, active blockers during review, and missing completion estimates.
+- [x] Implement the separate Customer Service availability forecast without bypassing current readiness or holds.
+- [x] Test unauthorized release, multiple holds, uncertain completion, feasible forecasts, and work that cannot finish in time.
+- [x] Complete the scoped Mechanic resolution/human-release path and recorded outcome.
+- [x] Run lint, typecheck, tests, build, and relevant interface verification.
+- [x] Capture a short end-to-end demonstration and update the checkpoint.
 
-- [x] Validate Customer Service requirements through eight accepted discussion walkthroughs (2026-10-09); executable tests remain pending.
-- [ ] Implement sample existing/new customer routing, shared intake, verification gates, and proposal summary without building registration.
-- [ ] Implement delivery/pickup notes and feasibility reassessment.
-- [ ] Implement simulated four-hour temporary allocation, confirmed conversion, pre-acceptance cancellation, expiry, and reacquisition after recheck.
-- [ ] Implement callback sample records, ownership, agreed update time, review result and closure.
-- [ ] Test Customer Service walkthroughs, changed readiness during allocation, customer-impact acceptance and both-unit replacement protection.
-- [ ] Reconcile superseded read-only/allocation boundaries across existing architecture documents.
+- [x] Validate Customer Service requirements through eight accepted discussion walkthroughs (2026-10-09); executable tests are recorded in the checkpoint.
+- [x] Implement sample existing/new customer routing, shared intake, verification gates, and proposal summary without building registration.
+- [x] Implement delivery/pickup notes and feasibility reassessment.
+- [x] Implement simulated four-hour temporary allocation, confirmed conversion, pre-acceptance cancellation, expiry, and reacquisition after recheck.
+- [x] Implement callback sample records, ownership, agreed update time, review result and closure.
+- [x] Test Customer Service walkthroughs, changed readiness during allocation, customer-impact acceptance and both-unit replacement protection.
+- [x] Reconcile superseded read-only/allocation boundaries across existing architecture documents.
 
 ## Follow-up checklist
 
@@ -535,12 +535,16 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 
 ## Scope and checklist status
 
-Item 1 (repository baseline review) is complete; tests were not rerun during that review.
-Item 2 requirements preparation is complete; concrete implementation/data mapping, runtime implementation, executable tests and workflow demonstration remain pending.
-Item 3 responsibility map, staff authorities, review routing, hold release, forecast, presentation, and Customer Service workflow requirements are accepted. Eight readiness and eight Customer Service discussion walkthroughs are complete; Item 3 requirements preparation and validation criteria are complete; implementation, executable tests and demonstration remain pending.
-Items 4 (portfolio evidence) and 5 (validation/checkpoint) remain pending.
+Item 1 baseline review is complete; baseline tests were rerun in this increment.
+Item 2 scoped rental-rule implementation is verified. Item 3 scoped staff/Customer Service simulation is verified; runtime summaries are visibly labeled templates and live AI interpretation/generated explanation remains pending. All sixteen accepted paths have executable coverage.
+Item 4 portfolio packaging remains pending. Item 5 implementation validation/checkpoint is recorded; review and explicit merge authorization remain pending.
 
-This change documents requirements only. It does not change runtime code, data, readiness outcomes, or service schedules. Production reservations remain read-only; simulated temporary/confirmed allocation states are now approved demo scope. Building CRM/new-customer registration, production rental execution, transfers, procurement, and broad scheduling remain outside scope.
+The implementation updates runtime code and the reviewed source snapshot. Production reservations remain read-only; temporary/confirmed allocation and customer/staff decisions are simulated in memory. CRM registration, production rental execution, dispatch/transfers, procurement and broad scheduling remain outside scope.
+
+See [the implementation checkpoint](../checkpoints/2026-10-10-rental-workflow-implementation.md) for schema mapping, classification, source changes, verification and the demonstration. Preserve all approved decisions above as the review record; this status supersedes historical discussion statements that runtime/executable tests were pending.
+
+- [ ] Integrate live AI interpretation/generated explanation with grounded evidence and evaluations; templates currently demonstrate the presentation boundary.
+- [ ] Complete edited portfolio/video evidence after review of the working demo.
 
 ## Related references
 
@@ -549,3 +553,4 @@ This change documents requirements only. It does not change runtime code, data, 
 - [Equipment Readiness Data Model](equipment-readiness-data-model.md)
 - [AI, Human, and Deterministic-Control Boundary](../architecture/ai-human-deterministic-control-boundary.md)
 - [Post-PR 13 Checkpoint](../checkpoints/2026-08-14-post-pr-13.md)
+
