@@ -453,6 +453,24 @@ Reference shared information rather than duplicating it. Replacement plans suppo
 Retain these shared fields as the foundation for future Mechanic workflow validation data, particularly task criticality, policy/version and limits, warranty restrictions, scheduled/completed work, inspection evidence, holds, authorized decisions and reevaluation results. Reuse equipment/task/hold references to trace technical assessment through completion, required inspection and authorized release. Record this dependency before expanding the Mechanic role; broader Mechanic workflow design remains follow-up work.
 
 
+## Approved Item 3 validation criteria — 2026-10-10
+
+The requirements and acceptance criteria for Item 3 are approved. Completion of the implemented item requires evidence from executable tests and a working demonstration.
+
+| Area | Required demonstration |
+|---|---|
+| AI | Present brief, evidence-based proposals; identify missing information; invent no approvals or completion estimates. |
+| Deterministic rules | Enforce eligibility, service limits, conflicts, required verification checks, and allocation expiry. |
+| Staff authority | Permit decisions only within recorded roles and task-appropriate qualifications. |
+| Human acceptance | Require staff approval and customer acceptance before confirmation; record acceptance of customer-facing conditions. |
+| Reevaluation | Recheck changed inputs and final eligibility; preserve blockers until properly resolved. |
+| Decision history | Trace each approval, review, release, and allocation change to its actor, time, reason, and evidence. |
+
+Use sample staff identities and qualifications for the demo. Production authentication and the broader Mechanic workflow remain future work; these sample controls do not claim production identity verification. Keep the future Mechanic validation dependency on approved shared fields.
+
+Requirements preparation for Items 2 and 3 is complete. Concrete schema/contract mapping, seeded-task classification and evidence reconciliation are implementation design/data work. Runtime implementation, executable validation and working demonstration remain pending.
+
+
 ## PR 17 working agreement
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
@@ -483,7 +501,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Implement automatic proposal selection from deterministic eligibility/ranking and AI presentation through the final approval/acceptance gate.
 - [ ] Test automatic proposals, provisional options, ambiguous requirements, temporary allocation after qualifying selection, and prevention of confirmation before all approval/acceptance gates.
 - [ ] Connect Customer Service to the evidenced decision and conditional acknowledgement.
-- [ ] Implement staff-authority and qualification checks for human decisions.
+- [x] Approve Item 3 validation criteria and sample staff identity/qualification scope (2026-10-10).
+- [ ] Implement staff-authority and qualification checks for human decisions using sample identities.
 - [ ] Implement deterministic review routing and evidence-backed Customer Service responses.
 - [ ] Implement review-completion reevaluation and reassess prior decisions when relevant inputs change.
 - [ ] Test confirmed plans retaining holds, authorized release, permitted delay decisions, denial, incomplete review, and changed inputs.
@@ -517,8 +536,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 ## Scope and checklist status
 
 Item 1 (repository baseline review) is complete; tests were not rerun during that review.
-Item 2 (complete equipment-readiness workflow demonstration) remains in progress.
-Item 3 responsibility map, staff authorities, review routing, hold release, forecast, presentation, and Customer Service workflow requirements are accepted. Eight readiness and eight Customer Service discussion walkthroughs are complete; implementation and demonstration remain pending.
+Item 2 requirements preparation is complete; concrete implementation/data mapping, runtime implementation, executable tests and workflow demonstration remain pending.
+Item 3 responsibility map, staff authorities, review routing, hold release, forecast, presentation, and Customer Service workflow requirements are accepted. Eight readiness and eight Customer Service discussion walkthroughs are complete; Item 3 requirements preparation and validation criteria are complete; implementation, executable tests and demonstration remain pending.
 Items 4 (portfolio evidence) and 5 (validation/checkpoint) remain pending.
 
 This change documents requirements only. It does not change runtime code, data, readiness outcomes, or service schedules. Production reservations remain read-only; simulated temporary/confirmed allocation states are now approved demo scope. Building CRM/new-customer registration, production rental execution, transfers, procurement, and broad scheduling remain outside scope.
