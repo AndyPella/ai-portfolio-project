@@ -12,8 +12,8 @@
     {"scenario_id":"SCN-003","scenario_name":"Facility maintenance conflict","equipment_id":"EQ-1003","customer_id":"CUS-002","requested_start":"2026-09-09","requested_end":"2026-09-15","expected_outcome":"Not Available","primary_reason":"Facility maintenance overlaps requested period","assurance_test":"Schedule conflict"},
     {"scenario_id":"SCN-004","scenario_name":"Conditional on-site service","equipment_id":"EQ-1004","customer_id":"CUS-003","requested_start":"2026-09-10","requested_end":"2026-09-20","expected_outcome":"Rental Ready with Conditions","primary_reason":"On-site service window required","assurance_test":"Conditional decision"},
     {"scenario_id":"SCN-005","scenario_name":"Reservation conflict","equipment_id":"EQ-1005","customer_id":"CUS-002","requested_start":"2026-09-11","requested_end":"2026-09-14","expected_outcome":"Not Available","primary_reason":"Existing confirmed reservation overlaps","assurance_test":"Reservation conflict"},
-    {"scenario_id":"SCN-006","scenario_name":"Contradictory evidence","equipment_id":"EQ-1006","customer_id":"CUS-001","requested_start":"2026-09-08","requested_end":"2026-09-09","expected_outcome":"Human Review Required","primary_reason":"Asset status conflicts with open inspection defect","assurance_test":"Contradiction detection"},
-    {"scenario_id":"SCN-007","scenario_name":"Customer restriction","equipment_id":"EQ-1007","customer_id":"CUS-003","requested_start":"2026-09-15","requested_end":"2026-09-18","expected_outcome":"Remediation Required","primary_reason":"Required site documentation is missing","assurance_test":"Customer-context check"}
+    {"scenario_id":"SCN-006","scenario_name":"Contradictory evidence","equipment_id":"EQ-1006","customer_id":"CUS-001","requested_start":"2026-09-08","requested_end":"2026-09-09","expected_outcome":"Remediation Required","primary_reason":"Known repair and hold block rental; retain contradiction for Manager review","assurance_test":"Contradiction detection"},
+    {"scenario_id":"SCN-007","scenario_name":"Customer restriction","equipment_id":"EQ-1007","customer_id":"CUS-003","requested_start":"2026-09-15","requested_end":"2026-09-18","expected_outcome":"Rental Ready","primary_reason":"Equipment eligible; separate pending site documentation blocks final confirmation","assurance_test":"Customer-context check"}
   ],
   "equipment": [
     {"equipment_id":"EQ-1001","asset_qualification_reference":"AQR-2026-001","equipment_type":"Compact excavator","category":"Earthmoving","manufacturer":"Kubota","model":"KX040-4","model_year":2023,"serial_number":"NSR-KX040-001","current_location":"Portland Branch","current_status":"Equipment Ready","operating_hours":820,"capabilities":"4-ton excavator; auxiliary hydraulics","required_attachments":"24-inch bucket","last_rental_end":"2026-08-28","current_condition":"Good","record_updated":"2026-09-02"},
@@ -34,11 +34,11 @@
     {"inspection_id":"INSP-2007","equipment_id":"EQ-1007","inspection_type":"Post-rental safety inspection","required_after_each_rental":true,"inspection_date":"2026-08-30","related_rental_id":"RNT-7015","result":"Passed","defects_found":"None","corrective_work_reference":null,"valid_until":"2026-11-30","next_due_hours":700,"performed_by_role":"Equipment Inspector","evidence_reference":"EVID-INSP-2007"}
   ],
   "maintenance": [
-    {"maintenance_id":"MNT-3001","equipment_id":"EQ-1001","maintenance_type":"500-hour service","trigger_type":"Operating hours","due_date":null,"due_operating_hours":1000,"estimated_duration_hours":6,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":true,"status":"Not Due","evidence_reference":"EVID-MNT-3001","expected_hours_during_rental":32,"notes":"No conflict"},
+    {"maintenance_id":"MNT-3001","equipment_id":"EQ-1001","maintenance_type":"1,000-hour service (fictional demo)","trigger_type":"Operating hours","due_date":null,"due_operating_hours":1000,"estimated_duration_hours":6,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":true,"status":"Not Due","evidence_reference":"EVID-MNT-3001","expected_hours_during_rental":32,"notes":"No conflict"},
     {"maintenance_id":"MNT-3002","equipment_id":"EQ-1002","maintenance_type":"Hydraulic filter service","trigger_type":"Operating hours","due_date":null,"due_operating_hours":1200,"estimated_duration_hours":4,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":true,"status":"Upcoming","evidence_reference":"EVID-MNT-3002","expected_hours_during_rental":20,"notes":"Inspection must be completed first"},
     {"maintenance_id":"MNT-3003","equipment_id":"EQ-1003","maintenance_type":"Quarterly aerial maintenance","trigger_type":"Calendar","due_date":"2026-09-10","due_operating_hours":null,"estimated_duration_hours":16,"scheduled_start":"2026-09-10T08:00:00-07:00","scheduled_end":"2026-09-11T17:00:00-07:00","service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":true,"status":"Scheduled","evidence_reference":"EVID-MNT-3003","expected_hours_during_rental":35,"notes":"Overlaps requested rental"},
     {"maintenance_id":"MNT-3004","equipment_id":"EQ-1004","maintenance_type":"500-hour generator service","trigger_type":"Operating hours","due_date":null,"due_operating_hours":500,"estimated_duration_hours":2,"scheduled_start":"2026-09-15T10:00:00-07:00","scheduled_end":"2026-09-15T12:00:00-07:00","service_location_type":"Customer site","on_site_permitted":true,"operational_interruption":"Planned interruption","parts_confirmed":true,"technician_confirmed":true,"status":"Scheduled","evidence_reference":"EVID-MNT-3004","expected_hours_during_rental":40,"notes":"On-site service window required"},
-    {"maintenance_id":"MNT-3005","equipment_id":"EQ-1005","maintenance_type":"1,000-hour service","trigger_type":"Operating hours","due_date":null,"due_operating_hours":1100,"estimated_duration_hours":8,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":true,"status":"Upcoming","evidence_reference":"EVID-MNT-3005","expected_hours_during_rental":24,"notes":"No maintenance conflict"},
+    {"maintenance_id":"MNT-3005","equipment_id":"EQ-1005","maintenance_type":"1,100-hour service (fictional demo)","trigger_type":"Operating hours","due_date":null,"due_operating_hours":1100,"estimated_duration_hours":8,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":true,"status":"Upcoming","evidence_reference":"EVID-MNT-3005","expected_hours_during_rental":24,"notes":"No maintenance conflict"},
     {"maintenance_id":"MNT-3006","equipment_id":"EQ-1006","maintenance_type":"Throttle control repair","trigger_type":"Condition","due_date":"2026-09-05","due_operating_hours":null,"estimated_duration_hours":3,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Company facility","on_site_permitted":false,"operational_interruption":"Full outage","parts_confirmed":true,"technician_confirmed":false,"status":"Open","evidence_reference":"EVID-MNT-3006","expected_hours_during_rental":8,"notes":"Technician not confirmed"},
     {"maintenance_id":"MNT-3007","equipment_id":"EQ-1007","maintenance_type":"Battery inspection","trigger_type":"Calendar","due_date":"2026-10-01","due_operating_hours":null,"estimated_duration_hours":1,"scheduled_start":null,"scheduled_end":null,"service_location_type":"Branch or customer site","on_site_permitted":true,"operational_interruption":"No interruption","parts_confirmed":true,"technician_confirmed":true,"status":"Not Due","evidence_reference":"EVID-MNT-3007","expected_hours_during_rental":20,"notes":"Customer documentation remains outstanding"}
   ],
@@ -58,7 +58,7 @@
     {"service_capability_id":"SVC-5002","equipment_type":"Skid steer loader","work_type":"Post-rental inspection","service_provider_type":"Company inspector","permitted_on_site":true,"facility_required":false,"estimated_duration_hours":1,"required_certification":"Qualified equipment inspector","operational_interruption":"No interruption","advance_notice_hours":4},
     {"service_capability_id":"SVC-5003","equipment_type":"Articulating boom lift","work_type":"Quarterly aerial maintenance","service_provider_type":"Certified aerial specialist","permitted_on_site":false,"facility_required":true,"estimated_duration_hours":16,"required_certification":"Aerial-work-platform certification","operational_interruption":"Full outage","advance_notice_hours":72},
     {"service_capability_id":"SVC-5004","equipment_type":"Towable generator","work_type":"500-hour generator service","service_provider_type":"Mobile service technician","permitted_on_site":true,"facility_required":false,"estimated_duration_hours":2,"required_certification":"Generator service qualification","operational_interruption":"Planned interruption","advance_notice_hours":24},
-    {"service_capability_id":"SVC-5005","equipment_type":"Telehandler","work_type":"1,000-hour service","service_provider_type":"Company technician","permitted_on_site":false,"facility_required":true,"estimated_duration_hours":8,"required_certification":"Manufacturer-trained technician","operational_interruption":"Full outage","advance_notice_hours":48},
+    {"service_capability_id":"SVC-5005","equipment_type":"Telehandler","work_type":"1,100-hour service (fictional demo)","service_provider_type":"Company technician","permitted_on_site":false,"facility_required":true,"estimated_duration_hours":8,"required_certification":"Manufacturer-trained technician","operational_interruption":"Full outage","advance_notice_hours":48},
     {"service_capability_id":"SVC-5006","equipment_type":"Plate compactor","work_type":"Throttle control repair","service_provider_type":"Company technician","permitted_on_site":false,"facility_required":true,"estimated_duration_hours":3,"required_certification":"Small-engine technician","operational_interruption":"Full outage","advance_notice_hours":24},
     {"service_capability_id":"SVC-5007","equipment_type":"Scissor lift","work_type":"Battery inspection","service_provider_type":"Company inspector","permitted_on_site":true,"facility_required":false,"estimated_duration_hours":1,"required_certification":"Aerial-work-platform qualification","operational_interruption":"No interruption","advance_notice_hours":8}
   ],
@@ -66,5 +66,670 @@
     {"customer_id":"CUS-001","customer_type":"Homeowner","service_location":"Portland Metro","contract_requirements":"Standard rental terms","required_documentation":"Standard operating guide","site_restrictions":"Residential access; noise limits","equipment_requirements":"No special configuration","on_site_service_allowed":false,"access_windows":"08:00-18:00","operational_notes":"Limited operational context only"},
     {"customer_id":"CUS-002","customer_type":"Industrial","service_location":"Industrial site","contract_requirements":"Approved equipment list; delivery coordination","required_documentation":"Inspection certificate; maintenance status","site_restrictions":"Security check-in; scheduled delivery","equipment_requirements":"Industrial-use configuration","on_site_service_allowed":true,"access_windows":"06:00-16:00","operational_notes":"On-site work requires advance approval"},
     {"customer_id":"CUS-003","customer_type":"Construction","service_location":"Restricted project site","contract_requirements":"Project-specific equipment and service rules","required_documentation":"Current inspection; site-compliance packet","site_restrictions":"Controlled access; planned service windows","equipment_requirements":"Site-ready accessories and documentation","on_site_service_allowed":true,"access_windows":"07:00-17:00","operational_notes":"Missing site-compliance packet triggers remediation"}
-  ]
+  ],
+  "rental_workflow": {
+    "policies": [
+      {
+        "policy_id": "NRE-MNT-001",
+        "version": "demo-1",
+        "system_group": "Safety and Control",
+        "name": "Safety and Control Service Delay Policy",
+        "max_days": 7,
+        "max_hours": 25,
+        "fictional": true
+      },
+      {
+        "policy_id": "NRE-MNT-002",
+        "version": "demo-1",
+        "system_group": "Engine and Power",
+        "name": "Engine and Power Service Delay Policy",
+        "max_days": 7,
+        "max_hours": 25,
+        "fictional": true
+      },
+      {
+        "policy_id": "NRE-MNT-003",
+        "version": "demo-1",
+        "system_group": "Hydraulics and Drivetrain",
+        "name": "Hydraulics and Drivetrain Service Delay Policy",
+        "max_days": 7,
+        "max_hours": 25,
+        "fictional": true
+      },
+      {
+        "policy_id": "NRE-MNT-004",
+        "version": "demo-1",
+        "system_group": "Electrical and Battery",
+        "name": "Electrical and Battery Service Delay Policy",
+        "max_days": 7,
+        "max_hours": 25,
+        "fictional": true
+      },
+      {
+        "policy_id": "NRE-MNT-005",
+        "version": "demo-1",
+        "system_group": "Accessories and Cosmetic",
+        "name": "Accessories and Cosmetic Service Delay Policy",
+        "max_days": 7,
+        "max_hours": 25,
+        "fictional": true
+      }
+    ],
+    "maintenance_controls": [
+      {
+        "maintenance_id": "MNT-3001",
+        "system_group": "Engine and Power",
+        "criticality": "Operationally critical",
+        "delay_gate": "No operation beyond service limit",
+        "policy_id": "NRE-MNT-002",
+        "policy_version": "demo-1",
+        "warranty_status": "Out of warranty",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1001; fictional reviewed task limits",
+        "warranty_max_days": null,
+        "warranty_max_hours": null,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3001",
+        "next_due_operating_hours": null
+      },
+      {
+        "maintenance_id": "MNT-3002",
+        "system_group": "Hydraulics and Drivetrain",
+        "criticality": "Operationally critical",
+        "delay_gate": "No operation beyond service limit",
+        "policy_id": "NRE-MNT-003",
+        "policy_version": "demo-1",
+        "warranty_status": "Out of warranty",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1002; fictional reviewed task limits",
+        "warranty_max_days": null,
+        "warranty_max_hours": null,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3002",
+        "next_due_operating_hours": null
+      },
+      {
+        "maintenance_id": "MNT-3003",
+        "system_group": "Safety and Control",
+        "criticality": "Safety-critical",
+        "delay_gate": "No operation beyond service limit",
+        "policy_id": "NRE-MNT-001",
+        "policy_version": "demo-1",
+        "warranty_status": "Out of warranty",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1003; fictional reviewed task limits",
+        "warranty_max_days": null,
+        "warranty_max_hours": null,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3003",
+        "next_due_operating_hours": null
+      },
+      {
+        "maintenance_id": "MNT-3004",
+        "system_group": "Engine and Power",
+        "criticality": "Operationally critical",
+        "delay_gate": "No operation beyond service limit",
+        "policy_id": "NRE-MNT-002",
+        "policy_version": "demo-1",
+        "warranty_status": "Covered",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1004; fictional reviewed task limits",
+        "warranty_max_days": 0,
+        "warranty_max_hours": 0,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3004",
+        "next_due_operating_hours": 1000
+      },
+      {
+        "maintenance_id": "MNT-3005",
+        "system_group": "Hydraulics and Drivetrain",
+        "criticality": "Operationally critical",
+        "delay_gate": "No operation beyond service limit",
+        "policy_id": "NRE-MNT-003",
+        "policy_version": "demo-1",
+        "warranty_status": "Out of warranty",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1005; fictional reviewed task limits",
+        "warranty_max_days": null,
+        "warranty_max_hours": null,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3005",
+        "next_due_operating_hours": null
+      },
+      {
+        "maintenance_id": "MNT-3006",
+        "system_group": "Safety and Control",
+        "criticality": "Safety-critical",
+        "delay_gate": "No operation beyond service limit",
+        "policy_id": "NRE-MNT-001",
+        "policy_version": "demo-1",
+        "warranty_status": "Out of warranty",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1006; fictional reviewed task limits",
+        "warranty_max_days": null,
+        "warranty_max_hours": null,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3006",
+        "next_due_operating_hours": null
+      },
+      {
+        "maintenance_id": "MNT-3007",
+        "system_group": "Electrical and Battery",
+        "criticality": "Noncritical",
+        "delay_gate": "Delay Permitted Within Policy",
+        "policy_id": "NRE-MNT-004",
+        "policy_version": "demo-1",
+        "warranty_status": "Out of warranty",
+        "warranty_reference": "DEMO-WARRANTY-EQ-1007; fictional reviewed task limits",
+        "warranty_max_days": null,
+        "warranty_max_hours": null,
+        "task_max_days": null,
+        "task_max_hours": null,
+        "assessed_by": "DEMO-MECH",
+        "assessment_evidence": "DEMO-ASSESS-MNT-3007; deliberately fictional noncritical periodic battery check, no safety/reliability consequence",
+        "next_due_operating_hours": null
+      }
+    ],
+    "staff": [
+      {
+        "staff_id": "DEMO-CS",
+        "name": "Sample Customer Service",
+        "role": "Customer Service",
+        "qualifications": []
+      },
+      {
+        "staff_id": "DEMO-MECH",
+        "name": "Sample qualified mechanic",
+        "role": "Mechanic",
+        "qualifications": [
+          "NRE-MNT-001",
+          "NRE-MNT-002",
+          "NRE-MNT-003",
+          "NRE-MNT-004",
+          "NRE-MNT-005",
+          "safety-inspection",
+          "Manufacturer-trained technician",
+          "Generator service qualification",
+          "Aerial-work-platform certification",
+          "Aerial-work-platform qualification",
+          "Small-engine technician",
+          "inspection:Compact excavator",
+          "inspection:Skid steer loader",
+          "inspection:Articulating boom lift",
+          "inspection:Towable generator",
+          "inspection:Telehandler",
+          "inspection:Plate compactor",
+          "inspection:Scissor lift",
+          "maintenance:MNT-3001",
+          "maintenance:MNT-3002",
+          "maintenance:MNT-3003",
+          "maintenance:MNT-3004",
+          "maintenance:MNT-3005",
+          "maintenance:MNT-3006",
+          "maintenance:MNT-3007"
+        ]
+      },
+      {
+        "staff_id": "DEMO-INSP",
+        "name": "Sample inspector",
+        "role": "Inspector",
+        "qualifications": [
+          "safety-inspection",
+          "inspection:Compact excavator",
+          "inspection:Skid steer loader",
+          "inspection:Articulating boom lift",
+          "inspection:Towable generator",
+          "inspection:Telehandler",
+          "inspection:Plate compactor",
+          "inspection:Scissor lift"
+        ]
+      },
+      {
+        "staff_id": "DEMO-MGR",
+        "name": "Sample manager",
+        "role": "Manager",
+        "qualifications": []
+      },
+      {
+        "staff_id": "DEMO-VIEW",
+        "name": "Sample general staff",
+        "role": "General Staff",
+        "qualifications": []
+      }
+    ],
+    "holds": [
+      {
+        "hold_id": "HOLD-1002",
+        "equipment_id": "EQ-1002",
+        "task_id": "INSP-2002",
+        "authority": "Mechanic",
+        "reason": "Required post-rental inspection",
+        "evidence": "INSP-2002; last rental 2026-09-03",
+        "active": true
+      },
+      {
+        "hold_id": "HOLD-1003",
+        "equipment_id": "EQ-1003",
+        "task_id": "MNT-3003",
+        "authority": "Mechanic",
+        "reason": "Required aerial work and release",
+        "evidence": "EVID-MNT-3003",
+        "active": true
+      },
+      {
+        "hold_id": "HOLD-1006",
+        "equipment_id": "EQ-1006",
+        "task_id": "MNT-3006",
+        "authority": "Manager",
+        "reason": "Contradictory ready status and throttle defect",
+        "evidence": "EVID-INSP-2006; EVID-MNT-3006",
+        "active": true
+      }
+    ],
+    "customer_checks": [
+      {
+        "customer_id": "CUS-001",
+        "route": "Existing",
+        "identity": "Verified",
+        "profile": "Verified",
+        "billing": "Verified",
+        "insurance_on_site": "Verified",
+        "insurance_transport": "Verified",
+        "evidence": "DEMO-CHECK-CUS-001"
+      },
+      {
+        "customer_id": "CUS-002",
+        "route": "Existing",
+        "identity": "Verified",
+        "profile": "Verified",
+        "billing": "Verified",
+        "insurance_on_site": "Verified",
+        "insurance_transport": "Verified",
+        "evidence": "DEMO-CHECK-CUS-002"
+      },
+      {
+        "customer_id": "CUS-003",
+        "route": "Existing",
+        "identity": "Verified",
+        "profile": "Verified",
+        "billing": "Verified",
+        "insurance_on_site": "Verified",
+        "insurance_transport": "Verified",
+        "evidence": "DEMO-CHECK-CUS-003"
+      }
+    ],
+    "rental_requests": [
+      {
+        "request_id": "REQ-SCN-001",
+        "customer_id": "CUS-001",
+        "equipment_type": "Compact excavator",
+        "capabilities": [
+          "4-ton excavator",
+          "auxiliary hydraulics"
+        ],
+        "attachments": [
+          "24-inch bucket"
+        ],
+        "pickup": "2026-09-08T09:00:00-07:00",
+        "return_at": "2026-09-12T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Portland Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 6.4,
+        "total_hours": 32,
+        "usage": [],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Verified",
+        "intake": {
+          "renter_name": "Sample renter CUS-001",
+          "company_name": "",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Portland Metro",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      },
+      {
+        "request_id": "REQ-SCN-002",
+        "customer_id": "CUS-001",
+        "equipment_type": "Skid steer loader",
+        "capabilities": [
+          "74 hp",
+          "standard-flow hydraulics"
+        ],
+        "attachments": [
+          "General-purpose bucket"
+        ],
+        "pickup": "2026-09-08T09:00:00-07:00",
+        "return_at": "2026-09-10T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Salem Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 6.666666666666667,
+        "total_hours": 20,
+        "usage": [],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Verified",
+        "intake": {
+          "renter_name": "Sample renter CUS-001",
+          "company_name": "",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Portland Metro",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      },
+      {
+        "request_id": "REQ-SCN-003",
+        "customer_id": "CUS-002",
+        "equipment_type": "Articulating boom lift",
+        "capabilities": [
+          "45-ft platform height"
+        ],
+        "attachments": [
+          "Fall-protection kit"
+        ],
+        "pickup": "2026-09-09T09:00:00-07:00",
+        "return_at": "2026-09-15T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Portland Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 5,
+        "total_hours": 35,
+        "usage": [],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Verified",
+        "intake": {
+          "renter_name": "Sample renter CUS-002",
+          "company_name": "Sample Project Company",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Industrial site",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      },
+      {
+        "request_id": "REQ-SCN-004",
+        "customer_id": "CUS-003",
+        "equipment_type": "Towable generator",
+        "capabilities": [
+          "58 kW prime power"
+        ],
+        "attachments": [
+          "Distribution box",
+          "cables"
+        ],
+        "pickup": "2026-09-10T09:00:00-07:00",
+        "return_at": "2026-09-20T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Hillsboro Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 4,
+        "total_hours": 40,
+        "usage": [
+          {
+            "start": "2026-09-10T09:00:00-07:00",
+            "end": "2026-09-10T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-11T09:00:00-07:00",
+            "end": "2026-09-11T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-12T09:00:00-07:00",
+            "end": "2026-09-12T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-13T09:00:00-07:00",
+            "end": "2026-09-13T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-14T09:00:00-07:00",
+            "end": "2026-09-14T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-15T12:00:00-07:00",
+            "end": "2026-09-15T16:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-16T09:00:00-07:00",
+            "end": "2026-09-16T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-17T09:00:00-07:00",
+            "end": "2026-09-17T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-18T09:00:00-07:00",
+            "end": "2026-09-18T13:00:00-07:00",
+            "hours": 4
+          },
+          {
+            "start": "2026-09-19T09:00:00-07:00",
+            "end": "2026-09-19T13:00:00-07:00",
+            "hours": 4
+          }
+        ],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Verified",
+        "intake": {
+          "renter_name": "Sample renter CUS-003",
+          "company_name": "Sample Project Company",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Remote construction site",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      },
+      {
+        "request_id": "REQ-SCN-005",
+        "customer_id": "CUS-002",
+        "equipment_type": "Telehandler",
+        "capabilities": [
+          "5,500-lb capacity",
+          "19-ft lift"
+        ],
+        "attachments": [
+          "Fork carriage"
+        ],
+        "pickup": "2026-09-11T09:00:00-07:00",
+        "return_at": "2026-09-14T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Salem Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 6,
+        "total_hours": 24,
+        "usage": [],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Verified",
+        "intake": {
+          "renter_name": "Sample renter CUS-002",
+          "company_name": "Sample Project Company",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Industrial site",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      },
+      {
+        "request_id": "REQ-SCN-006",
+        "customer_id": "CUS-001",
+        "equipment_type": "Plate compactor",
+        "capabilities": [
+          "Reversible plate",
+          "diesel"
+        ],
+        "attachments": [
+          "Transport wheels"
+        ],
+        "pickup": "2026-09-08T09:00:00-07:00",
+        "return_at": "2026-09-09T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Portland Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 4,
+        "total_hours": 8,
+        "usage": [],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Verified",
+        "intake": {
+          "renter_name": "Sample renter CUS-001",
+          "company_name": "",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Portland Metro",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      },
+      {
+        "request_id": "REQ-SCN-007",
+        "customer_id": "CUS-003",
+        "equipment_type": "Scissor lift",
+        "capabilities": [
+          "26-ft platform height",
+          "electric"
+        ],
+        "attachments": [
+          "Indoor wheel covers"
+        ],
+        "pickup": "2026-09-15T09:00:00-07:00",
+        "return_at": "2026-09-18T15:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "location": "Hillsboro Branch",
+        "intended_use": "Normal intended use",
+        "daily_hours": 5,
+        "total_hours": 20,
+        "usage": [],
+        "preparation_hours": 2,
+        "turnaround_hours": 2,
+        "logistics_confirmed": true,
+        "site_documents": "Pending",
+        "intake": {
+          "renter_name": "Sample renter CUS-003",
+          "company_name": "Sample Project Company",
+          "billing_contact": "Sample billing contact",
+          "billing_address": "Fictional billing address",
+          "delivery_address": "Restricted indoor site",
+          "primary_contact": "Sample rental contact",
+          "contact": "sample@example.invalid",
+          "pickup_contact": "Sample pickup contact",
+          "return_contact": "Sample return contact",
+          "responsibilities": "Customer operates equipment; branch coordinates handoff",
+          "notes": "Call arrival contact; confirm access and loading before dispatch"
+        }
+      }
+    ],
+    "reservation_timing": [
+      {
+        "reservation_id": "RSV-4001",
+        "pickup": "2026-09-08T09:00:00-07:00",
+        "return_at": "2026-09-12T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4002",
+        "pickup": "2026-09-08T09:00:00-07:00",
+        "return_at": "2026-09-10T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4003",
+        "pickup": "2026-09-09T09:00:00-07:00",
+        "return_at": "2026-09-15T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4004",
+        "pickup": "2026-09-10T09:00:00-07:00",
+        "return_at": "2026-09-20T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4005A",
+        "pickup": "2026-09-10T09:00:00-07:00",
+        "return_at": "2026-09-13T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4005B",
+        "pickup": "2026-09-11T09:00:00-07:00",
+        "return_at": "2026-09-14T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4006",
+        "pickup": "2026-09-08T09:00:00-07:00",
+        "return_at": "2026-09-09T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4007",
+        "pickup": "2026-09-15T09:00:00-07:00",
+        "return_at": "2026-09-18T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      },
+      {
+        "reservation_id": "RSV-4099",
+        "pickup": "2026-09-20T09:00:00-07:00",
+        "return_at": "2026-09-25T15:00:00-07:00",
+        "timezone": "America/Los_Angeles"
+      }
+    ]
+  }
 }
