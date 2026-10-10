@@ -90,7 +90,7 @@ Stable policy identities allow the demo references to become fuller policies lat
 
 Maintenance records must reference the applicable policy ID and version. Each group policy specifies maximum delay in days, operating hours, or both. When both apply, service must occur before either limit is exceeded. Task-specific and warranty requirements can impose stricter limits. Missing limits require review, never implied permission. A qualified Mechanic assesses work; a Manager approves use of a permitted delay within policy.
 
-Demo allowances must be explicitly labeled fictional. Numerical service-delay values remain unapproved; policy names do not establish allowances. Fuller policies can be developed later without changing the workflow.
+Approved fictional demo allowance: explicitly classified non-safety, noncritical work permitted by its policy may be postponed up to seven calendar days or 25 operating hours after it becomes due, whichever limit is reached first. Stricter task and warranty limits prevail; Mechanic assessment and Manager approval are required. Demo allowances must be explicitly labeled fictional; policy names alone do not establish eligibility. Fuller policies can be developed later without changing the workflow.
 
 ### Rental timing and protected buffers
 
@@ -139,7 +139,7 @@ Each maintenance record must carry or reference:
 
 Retain existing due dates/hour thresholds, schedules, service location, downtime, parts confirmation, technician confirmation, status, and completion evidence. Policy references must resolve to applicable limits; missing values must not become invented tolerances.
 
-Exact schema names, policy storage, and migration behavior are implementation decisions still to be reviewed.
+The minimum shared records below are approved; exact schema names, policy storage, and migration behavior remain implementation design decisions.
 
 ## Outcomes
 
@@ -149,14 +149,20 @@ Exact schema names, policy storage, and migration behavior are implementation de
 - Remediation Required: identified work or evidence must be completed before readiness can be established.
 - Human Review Required: classification, policy, warranty, or evidence is missing or contradictory.
 
-Final precedence for multiple simultaneous findings remains to be specified. Preserve all findings and evidence rather than hiding a known blocker.
+Approved precedence for simultaneous findings:
+1. Not Available when a known conflict or mandatory limit cannot be satisfied.
+2. Remediation Required when required work, inspection, or hold release remains incomplete.
+3. Human Review Required when no known blocker exists but classification, policy, warranty, or evidence needs resolution.
+4. Rental Ready with Conditions when all prerequisites pass and a confirmed plan affects the customer.
+5. Rental Ready when all prerequisites pass without customer-facing conditions.
+
+Retain all findings, evidence, and required actions regardless of the primary result. A confirmed repair plan may show a separate potentially-available-by-pickup forecast alongside current blocked status; it cannot replace that status.
 
 ## Open policy and data decisions
 
-No numerical delay allowance has been approved. Do not infer manufacturer policies from the fictional dataset or service names.
+The fictional seven-day/25-operating-hour noncritical allowance is approved. Do not infer manufacturer policies from the fictional dataset or service names.
 
-- Define a small set of fictional, explicitly labeled noncritical group allowances, in days and/or operating hours; Manager approval requires a Qualified Mechanic assessment.
-- Confirm task-level classifications for periodic engine, hydraulic, aerial, generator, telehandler, and battery work.
+- Apply the approved classification approach explicitly to each seeded task; reconcile task evidence during implementation.
 - Reconcile illustrative dataset inconsistencies, including periodic-service labels versus due-hour thresholds and corrective-work references.
 - Review the customer-restriction scenario against the display-only mock-customer boundary.
 - Decide how verified completion, operational hold release, and delay approval are represented and traced.
@@ -414,6 +420,39 @@ Keep the callback open until Customer Service records the customer update. If re
 
 Brief staff responses should show the actionable result, outstanding check, and recorded expiry or completion timing. Supporting evidence remains accessible. Internal approved delays without customer impact remain staff detail; customer-facing downtime/restrictions/swaps must be disclosed.
 
+## Approved classification and minimum data — 2026-10-10
+
+### Task classification
+
+| Classification | Illustrative demo examples | Treatment |
+|---|---|---|
+| Safety-critical | Brakes, emergency stops, steering safety faults, aerial lift interlocks, load-holding faults | No operation beyond service limit; existing unsafe condition blocks operation immediately. |
+| Operationally critical | Engine overheating, loss of hydraulic pressure, drivetrain failure, charging faults preventing reliable operation | No operation beyond service limit; an existing blocking failure requires repair. |
+| Noncritical | Cosmetic repairs, optional accessories, minor defects confirmed not to affect safety, reliability, or requested use | Approved allowance only with applicable policy/warranty permission, Mechanic assessment and Manager approval. |
+| Unclassified | Insufficient or contradictory evidence | Human Review Required; no delay authorized. |
+
+Classify by task purpose and consequence, not equipment type or the word routine. Periodic engine, hydraulic, generator, telehandler, aerial and battery service each require explicit task classification. Include one deliberately fictional noncritical periodic-service example with documented policy and warranty permission, alongside critical-service examples. This approves the approach; actual seeded-task mapping and evidence remain implementation work.
+
+### Minimum shared records
+
+| Record | Required information |
+|---|---|
+| Maintenance task | Equipment/task IDs, system group, criticality, delay gate, policy ID/version, due date/hour threshold, warranty restrictions, planned work and completion evidence |
+| Approval or hold | Decision, equipment/task/hold reference, authorized staff member, timestamp, reason, evidence, applicable limits |
+| Rental request | Customer reference, capabilities, pickup/return times and timezone, intended use, projected daily hours, logistics, special instructions |
+| Customer checks | Existing/new status, required profile, billing and insurance verification results |
+| Allocation | Request/equipment references, protected period, temporary/confirmed/canceled/expired status, creation and expiry times |
+| Service or replacement plan | Equipment segments, service/swap timing, confirmed logistics, downtime, customer acceptance and approvals |
+| Evaluation | Current readiness, requested-period outcome, separate forecast, all findings, evidence, required actions |
+| Callback | Request, contact, agreed update time, reviewer, Customer Service owner, review result, customer-update status |
+
+Reference shared information rather than duplicating it. Replacement plans support multiple equipment allocations for their respective segments. Exact field names, types, schema migration and contract mapping are implementation design work within these approved requirements.
+
+### Future Mechanic workflow validation
+
+Retain these shared fields as the foundation for future Mechanic workflow validation data, particularly task criticality, policy/version and limits, warranty restrictions, scheduled/completed work, inspection evidence, holds, authorized decisions and reevaluation results. Reuse equipment/task/hold references to trace technical assessment through completion, required inspection and authorized release. Record this dependency before expanding the Mechanic role; broader Mechanic workflow design remains follow-up work.
+
+
 ## PR 17 working agreement
 
 PR #17 is the working decision record and implementation PR for this increment. Record accepted decisions here, implement sufficiently defined requirements on its branch, and retain unresolved policy values explicitly.
@@ -425,7 +464,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 ## Implementation checklist
 
 - [ ] Reconcile existing readiness/availability documents with these requirements.
-- [ ] Define and review the minimal policy schema and maintenance-record additions.
+- [x] Approve minimum shared record requirements, classification approach, fictional allowance and multiple-findings precedence (2026-10-10).
+- [ ] Map approved shared records to concrete schema/types and maintenance-record additions.
 - [ ] Update the editable source, reviewed JSON snapshot, types, and validator through the established data workflow.
 - [ ] Classify seeded tasks and add explicit fictional warranty and policy evidence.
 - [ ] Implement the read-only availability evaluator consuming Equipment Readiness.
@@ -471,6 +511,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Work through reservation requirements for days, weeks, and months in advance, including reservation creation scope and the up-to-five-day in-time classification.
 
 - [ ] Define cancellation after confirmed acceptance.
+
+- [ ] Reuse approved shared fields for future Mechanic workflow validation data and detailed role expansion.
 
 ## Scope and checklist status
 
