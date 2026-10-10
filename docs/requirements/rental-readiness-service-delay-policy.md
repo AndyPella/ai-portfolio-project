@@ -71,6 +71,46 @@ Supported gate values:
 
 The group selects the default; task criticality, warranty requirements, and task-specific restrictions can make it stricter. Group membership alone does not establish an allowance.
 
+## Approved policy references, timing, and usage — 2026-10-10
+
+### Named service-delay policies
+
+Stable policy identities allow the demo references to become fuller policies later.
+
+| Policy ID | Policy name |
+|---|---|
+| NRE-MNT-001 | Safety and Control Service Delay Policy |
+| NRE-MNT-002 | Engine and Power Service Delay Policy |
+| NRE-MNT-003 | Hydraulics and Drivetrain Service Delay Policy |
+| NRE-MNT-004 | Electrical and Battery Service Delay Policy |
+| NRE-MNT-005 | Accessories and Cosmetic Service Delay Policy |
+
+Maintenance records must reference the applicable policy ID and version. Each group policy specifies maximum delay in days, operating hours, or both. When both apply, service must occur before either limit is exceeded. Task-specific and warranty requirements can impose stricter limits. Missing limits require review, never implied permission. A qualified Mechanic assesses work; a Manager approves use of a permitted delay within policy.
+
+Demo allowances must be explicitly labeled fictional. Numerical service-delay values remain unapproved; policy names do not establish allowances. Fuller policies can be developed later without changing the workflow.
+
+### Rental timing and protected buffers
+
+| Area | Approved demo rule |
+|---|---|
+| Rental times | Require pickup and return date/time in the branch's local timezone; obtain missing times before confirmation. |
+| Preparation | Default two hours before pickup for inspection, preparation, and loading. |
+| Return turnaround | Default two hours after return for unloading, inspection, and routine preparation. |
+| Additional work or transport | Use recorded duration when it requires more time than the default buffer. |
+| Protected interval | Protect from preparation start through turnaround completion; another booking may start preparation exactly when the prior interval ends. |
+| Pre-rental required work | Required maintenance, safety checks, and authorized hold release must finish before preparation begins. |
+| Previous 24-hour completion buffer | Replace the blanket requirement with the preparation rule above. Confirmed completion plans support forecasts only until verified completion/release. |
+| Temporary allocation | Four hours from creation measures draft protection lifespan, separate from rental dates and operational buffers. |
+
+Defaults are fictional and configurable. Early completion alone does not shorten protected time; a recorded update and reevaluation are required. A Monday 9 AM pickup and Friday 3 PM return protects Monday 7 AM through Friday 5 PM unless recorded work or transport requires longer.
+
+### Projected operating hours
+
+Capture expected operating hours per day when service depends on usage. Calculate when the equipment would reach its service threshold and schedule required service or replacement before that threshold. A daily estimate must not become an invented precise clock time: request a more specific usage plan when needed to establish safe timing. Reevaluate when dates or expected usage change.
+
+Example: a meter at 480 hours, mandatory service at 500 hours, and expected use of eight hours per day reaches the threshold during day three (after four operating hours that day). Required service or replacement must occur before further operation would exceed 500 hours. Calendar scheduling alone does not prove compliance.
+
+
 ## Warranty gate
 
 | Warranty circumstance | Treatment |
@@ -90,7 +130,7 @@ Each maintenance record must carry or reference:
 - System group.
 - Service criticality.
 - Delay gate.
-- Applicable delay-policy reference.
+- Applicable delay-policy ID and version.
 - Warranty requirement or reference.
 - Task-specific restrictions overriding the group default.
 
@@ -113,11 +153,7 @@ Final precedence for multiple simultaneous findings remains to be specified. Pre
 No numerical delay allowance has been approved. Do not infer manufacturer policies from the fictional dataset or service names.
 
 - Define a small set of fictional, explicitly labeled noncritical group allowances, in days and/or operating hours; Manager approval requires a Qualified Mechanic assessment.
-- Decide how concurrent time/hour limits apply.
 - Confirm task-level classifications for periodic engine, hydraulic, aerial, generator, telehandler, and battery work.
-- Resolve the existing 24-hour pre-rental completion buffer: conditional timing risk versus absolute gate.
-- Specify date-only request times, timezone, overlap boundaries, and preparation/return buffer semantics.
-- Establish projected usage timing so service happens before a mandatory hour limit, not merely before rental end.
 - Reconcile illustrative dataset inconsistencies, including periodic-service labels versus due-hour thresholds and corrective-work references.
 - Review the customer-restriction scenario against the display-only mock-customer boundary.
 - Decide how verified completion, operational hold release, and delay approval are represented and traced.
@@ -232,7 +268,7 @@ The loop is request → review → decision → reevaluation → customer respon
 
 Recorded on 2026-10-09. Return to reservations as an explicit follow-up: the desired capability is to reserve equipment and understand availability on a future timeline, including requests days, weeks, or months before pickup.
 
-In-time reservations are requests made up to five days before pickup. This is a lead-time classification, not an availability horizon or a replacement for the existing three-day pre-rental work-review window or 24-hour completion buffer.
+In-time reservations are requests made up to five days before pickup. This is a lead-time classification, not an availability horizon or a replacement for the existing three-day pre-rental work-review window ; the former blanket 24-hour completion buffer is superseded by the approved preparation rule.
 
 Future availability must account for the requested rental period and relevant commitments, service projections, buffers, and holds rather than evaluating only immediate availability. Future forecasts must remain separate from current verified readiness.
 
@@ -390,8 +426,8 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [ ] Update the editable source, reviewed JSON snapshot, types, and validator through the established data workflow.
 - [ ] Classify seeded tasks and add explicit fictional warranty and policy evidence.
 - [ ] Implement the read-only availability evaluator consuming Equipment Readiness.
-- [ ] Evaluate reservation/hold conflicts and requested-period buffers.
-- [ ] Evaluate due service, projected hours, stop-operation rules, delay gates, and warranty limits.
+- [ ] Evaluate reservation/hold conflicts using approved two-hour preparation/return defaults, recorded longer durations, branch timezone, and adjacent protected intervals.
+- [ ] Evaluate due service, daily projected hours and specific usage timing where required, stop-operation rules, versioned policy references, delay gates, and warranty limits.
 - [ ] Return structured outcomes, reason codes, evidence, conditions, and required actions.
 - [ ] Test normal readiness, failed safety, incomplete maintenance, reservations, holds, full outages, missing policy/warranty, allowed delay, exceeded delay, and mandatory service stops.
 - [ ] Prove misuse/delivery/pickup exclusions do not bypass readiness controls.
