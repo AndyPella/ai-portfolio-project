@@ -52,20 +52,23 @@ Non-safety, noncritical service may be delayed only within an established allowa
 
 Customer acknowledgement is required before final handoff for work, interruptions, swaps, or restrictions that affect the customer. An approved internal service delay with no customer impact does not require customer disclosure or acknowledgement. Acceptance cannot extend service limits.
 
+
+Service delay means postponing service beyond its due date or operating-hour threshold; it does not mean the time needed to schedule and complete work. The gate "No operation beyond service limit" prohibits continued operation beyond the mandatory point until required work is completed and verified. Work may be scheduled for later while equipment remains stopped or on hold. A rental can proceed after required pre-rental work/checks/release finish before preparation begins, or under a confirmed service stop or replacement plan before the mandatory limit. Scheduling does not release a hold or establish readiness.
+
 ## Simple system-group delay gates
 
 Use system groups rather than extensive component-level policies. A specific task may impose a stricter restriction.
 
 | System group | Default treatment |
 |---|---|
-| Safety and control systems | No delay for safety-related work |
+| Safety and control systems | No operation beyond the mandatory service limit for safety-related work |
 | Engine and power generation | Noncritical delay only within policy and warranty limits |
 | Hydraulics and drivetrain | Same; faults affecting safe or reliable operation block use |
 | Electrical and batteries | Distinguish safety/operational faults from noncritical service |
 | Accessories and cosmetic items | Delay may be allowed only if not required for safety or requested use |
 
 Supported gate values:
-- No Delay
+- No operation beyond service limit
 - Delay Permitted Within Policy
 - Human Review Required
 
@@ -319,7 +322,7 @@ All eight walkthroughs were reviewed individually and accepted by the user. Thes
 | 2 | No ready unit; confirmed maintenance completion before pickup | Present potentially available, pending completion and authorized release. Include the recorded projected completion date/time; do not invent an estimate. Reevaluate after completion and release. |
 | 3 | No ready or confirmed conditional unit; uncertain hold resolution | No qualifying availability for the requested type and dates. Exclude unresolved holds from rental selection. Offer a callback after Mechanic or Manager review under approved authority, or customer-agreed changes to dates/location/requirements. Promise an update, not availability. Keep holds active until properly released, then reevaluate. |
 | 4 | Service due during rental; approved delay meets all rules | Treat as Test 1, Rental Ready, when all policy/warranty limits pass and there is no customer impact. Service detail remains available to Customer Service; no customer disclosure is needed solely for the internal delay. Disclose any restriction or interruption affecting the customer. |
-| 5 | Service cannot be delayed | A confirmed plan must satisfy the mandatory limit. Pre-pickup work follows Test 2 then Test 1; service during rental requires disclosure and customer acceptance of interruption. No confirmed plan follows Test 3. No operation past the mandatory limit until service is verified complete. |
+| 5 | Operation cannot continue beyond mandatory service limit | A confirmed plan must satisfy the mandatory limit. Pre-pickup work follows Test 2 then Test 1; service during rental requires disclosure and customer acceptance of interruption. No confirmed plan follows Test 3. No operation past the mandatory limit until service is verified complete. |
 | 6 | Warranty prevents an otherwise permitted delay | Warranty requirements take precedence over general company delay allowances. Manager cannot waive them. Use the established pre-pickup, service-during-rental, or unavailable/callback paths. |
 | 7 | Incomplete or conflicting repair/safety/release records | Exclude the unit until evidence and authorized release support readiness. Repair completion alone does not prove required reinspection passed. Known missing inspection requires completing/recording it; contradictory evidence or exception holds require Manager review with Mechanic support. Reevaluate after resolution; use Test 3 callback when no other qualifying option exists. |
 | 8 | Dates or projected usage change | Automatically reevaluate the full revised request, conflicts, buffers, service limits, and applicability of prior approvals. A confirmed replacement swap can support the rental when it satisfies the requirements below. |
