@@ -3,7 +3,7 @@
     "schema_version": "1.0",
     "dataset_name": "Northstar Ridge Equipment Readiness Demo Data",
     "data_classification": "Fictional and public-safe",
-    "source_type": "Static snapshot of private working Google Sheet",
+    "source_type": "Authoritative version-controlled fictional demo dataset",
     "source_timezone": "America/Los_Angeles"
   },
   "demo_scenarios": [

@@ -484,7 +484,7 @@ Keep the PR open for review until the user explicitly authorizes merging. This a
 - [x] Reconcile existing readiness/availability documents with these requirements.
 - [x] Approve minimum shared record requirements, classification approach, fictional allowance and multiple-findings precedence (2026-10-10).
 - [x] Map approved shared records to concrete schema/types and maintenance-record additions.
-- [x] Update the editable source, reviewed JSON snapshot, types, and validator through the established data workflow.
+- [x] Update the authoritative repository JSON dataset, types, and validator through PR review and the established data workflow.
 - [x] Classify seeded tasks and add explicit fictional warranty and policy evidence.
 - [x] Implement the read-only availability evaluator consuming Equipment Readiness.
 - [x] Evaluate reservation/hold conflicts using approved two-hour preparation/return defaults, recorded longer durations, branch timezone, and adjacent protected intervals.
@@ -539,7 +539,7 @@ Item 1 baseline review is complete; baseline tests were rerun in this increment.
 Item 2 scoped rental-rule implementation is verified. Item 3 scoped staff/Customer Service simulation is verified; runtime summaries are visibly labeled templates and live AI interpretation/generated explanation remains pending. All sixteen accepted paths have executable coverage.
 Item 4 portfolio packaging remains pending. Item 5 implementation validation/checkpoint is recorded; review and explicit merge authorization remain pending.
 
-The implementation updates runtime code and the reviewed source snapshot. Production reservations remain read-only; temporary/confirmed allocation and customer/staff decisions are simulated in memory. CRM registration, production rental execution, dispatch/transfers, procurement and broad scheduling remain outside scope.
+The implementation updates runtime code and the authoritative repository JSON dataset. Production reservations remain read-only; temporary/confirmed allocation and customer/staff decisions are simulated in memory. CRM registration, production rental execution, dispatch/transfers, procurement and broad scheduling remain outside scope.
 
 See [the implementation checkpoint](../checkpoints/2026-10-10-rental-workflow-implementation.md) for schema mapping, classification, source changes, verification and the demonstration. Preserve all approved decisions above as the review record; this status supersedes historical discussion statements that runtime/executable tests were pending.
 

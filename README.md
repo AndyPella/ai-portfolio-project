@@ -45,6 +45,10 @@ The project is designed to show the work behind a responsible prototype: assumpt
 
 This project uses fictional company data and synthetic operational scenarios. It does not include employer-confidential information, proprietary systems, customer data, credentials, or internal business records.
 
+The authoritative demo dataset is `data/northstar-ridge-demo-data.json`. Edit it
+through pull requests and run the documented validation checks. The former Google
+Sheet is a historical copy; the application requires no Drive connection or synchronization.
+
 ## Run the application locally
 
 Prerequisites:
@@ -78,7 +82,7 @@ Useful entry points:
 
 - [Project scope](docs/project-scope.md)
 - [Assumptions](docs/assumptions.md)
-- [Data snapshot workflow](docs/data-snapshot-workflow.md)
+- [Demo data workflow](docs/data-snapshot-workflow.md)
 - [Detailed scope](docs/scope.md)
 - [Requirements](docs/requirements)
 - [Architecture](docs/architecture)

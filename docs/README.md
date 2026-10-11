@@ -14,7 +14,7 @@ This directory preserves the evidence used to select, design, build, test, and p
 | `testing/` | Evaluation plans, scenarios, results, and revisions |
 | `case-study/` | Curated employer-facing build story |
 | `checkpoints/` | Dated project-state records and restart points |
-| `data-snapshot-workflow.md` | Authoritative Sheet-to-snapshot workflow and normalization rules |
+| `data-snapshot-workflow.md` | Authoritative repository JSON workflow and normalization rules |
 
 ## Latest Checkpoint
 
@@ -27,9 +27,9 @@ This directory preserves the evidence used to select, design, build, test, and p
 ## Working Dataset
 
 - **Name:** Northstar Ridge Equipment Readiness Demo Data
-- **Location:** Private project Google Drive
-- **Editable source:** Private Google Sheet
-- **Runtime snapshot:** `data/northstar-ridge-demo-data.json`
+- **Authoritative editable source and runtime dataset:** `data/northstar-ridge-demo-data.json`
+- **Change control:** Pull-request review and dataset validation
+- **Historical copy:** Former private Google Sheet; no ongoing synchronization
 - **Purpose:** Fictional seed records and repeatable test scenarios
 - **Classification:** Fictional and public-safe
 - **Repository references:**
@@ -39,11 +39,8 @@ This directory preserves the evidence used to select, design, build, test, and p
   - [Mechanic Equipment Work Workflow](architecture/mechanic-equipment-work-workflow.md)
   - [AI, Human, And Deterministic-Control Boundary](architecture/ai-human-deterministic-control-boundary.md)
 
-The private Google Drive link is intentionally not published in repository
-documentation.
-
-See [Northstar Ridge Data Snapshot Workflow](data-snapshot-workflow.md) for the
-authoritative Google Sheet → reviewed JSON snapshot → application process.
+See [Northstar Ridge Demo Data Workflow](data-snapshot-workflow.md) for the
+authoritative JSON edit → validation and PR review → application process.
 
 ## Working Rule
 

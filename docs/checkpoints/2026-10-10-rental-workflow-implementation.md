@@ -1,5 +1,9 @@
 # Rental workflow implementation checkpoint — 2026-10-10
 
+> Historical checkpoint: the Sheet-source workflow described here was superseded
+> on October 11, 2026 by the approved [repository JSON workflow](../data-snapshot-workflow.md).
+> The authoritative dataset is now `data/northstar-ridge-demo-data.json`.
+
 PR 17 implements the approved rental rules and in-memory staff/customer simulation. It remains open for review; merge is not authorized.
 
 ## Item status
