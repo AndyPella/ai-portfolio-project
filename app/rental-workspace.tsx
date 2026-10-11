@@ -30,6 +30,12 @@ const stamp = (value: string) =>
     dateStyle: "medium",
     timeStyle: "short",
   });
+// Format display text only; preserve canonical timestamps in approval scopes.
+const readableTimes = (value: string) =>
+  value.replace(
+    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/g,
+    (timestamp) => `${stamp(timestamp)} Pacific`,
+  );
 export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   const [state, setState] = useState(() =>
     createRentalState(validateRentalDataset(source)),
@@ -552,7 +558,13 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
               >
                 {result.outcome}
               </span>
-              <p className="brief-summary">{result.summary}</p>
+              <p className="brief-summary">
+                {draft?.status === "Confirmed" && isReady(result)
+                  ? result.conditions.length > 0
+                    ? "Rental confirmed. Required service/replacement conditions have been accepted."
+                    : "Rental confirmed for your requested dates."
+                  : readableTimes(result.summary)}
+              </p>
               <dl className="decision-facts">
                 <dt>Current equipment readiness</dt>
                 <dd>
@@ -594,7 +606,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 <div className="conditions">
                   <strong>Customer-facing conditions</strong>
                   {result.conditions.map((c) => (
-                    <p key={c}>{c}</p>
+                    <p key={c}>{readableTimes(c)}</p>
                   ))}
                   <button
                     className="secondary"
@@ -703,12 +715,17 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                       <strong>
                         {f.code} · {f.outcome}
                       </strong>
-                      <p>{f.message}</p>
+                      <p>{readableTimes(f.message)}</p>
                       <small>
                         {f.reference} · {f.evidence}
                       </small>
                       <p>
-                        {f.reviewer ?? "Staff detail"}: {f.action}
+                        {f.reviewer ?? "Staff detail"}:{" "}
+                        {draft?.status === "Confirmed" &&
+                        isReady(result) &&
+                        f.code === "SERVICE_STOP"
+                          ? "Customer acceptance recorded. Required service stop remains in force."
+                          : readableTimes(f.action)}
                       </p>
                     </div>
                   ))

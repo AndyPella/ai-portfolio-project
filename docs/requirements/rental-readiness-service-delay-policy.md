@@ -554,3 +554,17 @@ See [the implementation checkpoint](../checkpoints/2026-10-10-rental-workflow-im
 - [AI, Human, and Deterministic-Control Boundary](../architecture/ai-human-deterministic-control-boundary.md)
 - [Post-PR 13 Checkpoint](../checkpoints/2026-08-14-post-pr-13.md)
 
+## User walkthrough review — October 11, 2026
+
+- Walkthrough 1 (ready rental): accepted; temporary protection, staff approval,
+  customer acceptance and confirmed allocation retention verified in the browser.
+- Walkthrough 2 (inspection hold): accepted; passed checks and qualified routine
+  hold release remain separate, with allocation blocked until release.
+- Walkthrough 3 (required on-site service): accepted for both customer acceptance
+  and decline branches. Approved presentation correction: display readable Pacific
+  dates/times and replace pending-acceptance prompts with confirmation after
+  acceptance. Keep the required service stop visible and in force.
+- Implemented the wording correction in the presentation layer only; canonical
+  timestamps, approval scopes, service controls and seed records remain unchanged.
+  Extended browser verification passes for readable service windows, confirmed
+  summaries and recorded acceptance evidence; production build, lint and typecheck pass.

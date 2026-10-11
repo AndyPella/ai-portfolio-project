@@ -66,6 +66,10 @@ try {
     .filter({ hasText: "Accept recorded" })
     .waitFor();
   assert.match(await panel.innerText(), /Confirmed/);
+  assert.match(
+    await panel.innerText(),
+    /Rental confirmed for your requested dates/,
+  );
   await page
     .getByRole("button", { name: "Advance four hours", exact: true })
     .click();
@@ -77,6 +81,8 @@ try {
     .getByRole("combobox", { name: /Demo request/ })
     .selectOption("REQ-SCN-004");
   assert.match(await panel.innerText(), /Rental Ready with Conditions/);
+  assert.match(await panel.innerText(), /Sep 15, 2026, 10:00 AM Pacific/);
+  assert.doesNotMatch(await panel.innerText(), /2026-09-15T10:00:00/);
   await page
     .getByRole("button", { name: "Protect for four hours", exact: true })
     .click();
@@ -89,6 +95,36 @@ try {
     .waitFor();
   assert.match(await panel.innerText(), /Not Available/);
   console.log("PASS service disclosure and recorded customer decline");
+  await page.reload({ waitUntil: "networkidle" });
+  await page
+    .getByRole("combobox", { name: /Demo request/ })
+    .selectOption("REQ-SCN-004");
+  await page
+    .getByLabel("Decision reason", { exact: true })
+    .fill("Customer accepts disclosed service stop");
+  await page
+    .getByLabel("Evidence reference", { exact: true })
+    .fill("UI-SMOKE-SERVICE-ACCEPTANCE");
+  for (const name of [
+    "Protect for four hours",
+    "Approve proposal",
+    "Record customer acceptance",
+  ]) {
+    await page.getByRole("button", { name, exact: true }).click();
+  }
+  assert.match(
+    await panel.innerText(),
+    /Rental confirmed\. Required service\/replacement conditions have been accepted/,
+  );
+  assert.doesNotMatch(await panel.innerText(), /Confirm customer acceptance/);
+  await panel.locator("details summary").click();
+  assert.match(
+    await panel.innerText(),
+    /Customer acceptance recorded\. Required service stop remains in force/,
+  );
+  console.log(
+    "PASS readable service times and confirmation wording after acceptance",
+  );
   await page
     .getByRole("combobox", { name: /Demo request/ })
     .selectOption("REQ-SCN-002");
