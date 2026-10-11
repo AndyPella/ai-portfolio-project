@@ -179,6 +179,23 @@ try {
     "PASS qualified inspection, routine release and exact four-hour expiry",
   );
   await page
+    .getByRole("button", { name: "Protect for four hours", exact: true })
+    .click();
+  const acceptance = page.getByRole("button", {
+    name: "Record customer acceptance",
+    exact: true,
+  });
+  assert.equal(await acceptance.isDisabled(), true);
+  await page
+    .getByRole("button", { name: "Approve proposal", exact: true })
+    .click();
+  assert.equal(await acceptance.isDisabled(), false);
+  await acceptance.click();
+  assert.match(await panel.innerText(), /EQ-1002 · Confirmed/);
+  console.log(
+    "PASS renewed protection requires fresh staff approval before enabling acceptance",
+  );
+  await page
     .getByRole("combobox", { name: /Demo request/ })
     .selectOption("REQ-SCN-007");
   assert.match(await panel.innerText(), /Required site documentation: Pending/);

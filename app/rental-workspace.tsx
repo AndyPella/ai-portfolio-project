@@ -668,6 +668,9 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                   disabled={
                     !isCS ||
                     !assigned.length ||
+                    !draft?.approved_scope ||
+                    assigned.some((a) => a.scope !== draft.approved_scope) ||
+                    !isReady(result) ||
                     checks.length > 0 ||
                     draft?.status === "Confirmed"
                   }

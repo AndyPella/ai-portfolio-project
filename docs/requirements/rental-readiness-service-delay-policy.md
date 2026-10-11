@@ -568,3 +568,14 @@ See [the implementation checkpoint](../checkpoints/2026-10-10-rental-workflow-im
   timestamps, approval scopes, service controls and seed records remain unchanged.
   Extended browser verification passes for readable service windows, confirmed
   summaries and recorded acceptance evidence; production build, lint and typecheck pass.
+- Walkthrough 4 (customer paperwork): accepted with the existing protection refresh
+  after saving changed paperwork. Equipment remains protected while paperwork is
+  completed; final acceptance requires verified checks and current protection/approval.
+- Walkthrough 5 (callback): accepted; agreed customer update, CS ownership, Manager
+  routing for conflicting records, unfinished-review reminder and customer-update
+  closure were verified in the browser. Closing a callback does not release a hold.
+- Walkthrough 6 (four-hour expiry): accepted; draft/notes and expired history are
+  preserved, with renewed availability evaluation, protection and fresh approval.
+  Approved correction: keep customer acceptance disabled until the current
+  protection has recorded staff approval. Extended browser verification covers
+  disabled acceptance after renewal and enabled acceptance after fresh approval.
