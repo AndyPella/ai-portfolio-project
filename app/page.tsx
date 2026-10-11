@@ -49,6 +49,10 @@ export default function Home() {
             Explore how Northstar Ridge teams assess equipment status, surface
             operational needs, and coordinate the work that keeps the fleet moving.
           </p>
+          <nav className="project-links" aria-label="Project background">
+            <a href="/project/role" target="_blank" rel="noopener noreferrer">My role in this project <span>(opens new tab)</span></a>
+            <a href="/project/requirements" target="_blank" rel="noopener noreferrer">From requirements to product <span>(opens new tab)</span></a>
+          </nav>
           <div className="notice" role="note">
             <span aria-hidden="true">i</span>
             <div><strong>Demo uses fictional data</strong><p>No customer, employee, or equipment records shown in this experience are real.</p></div>
