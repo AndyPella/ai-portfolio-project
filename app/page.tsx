@@ -50,6 +50,7 @@ export default function Home() {
             operational needs, and coordinate the work that keeps the fleet moving.
           </p>
           <nav className="project-links" aria-label="Project background">
+            <a href="#guided-walkthrough">Start guided walkthrough</a>
             <a href="/project/role" target="_blank" rel="noopener noreferrer">My role in this project <span>(opens new tab)</span></a>
             <a href="/project/requirements" target="_blank" rel="noopener noreferrer">From requirements to product <span>(opens new tab)</span></a>
           </nav>

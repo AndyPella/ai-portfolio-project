@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { chromium } from "playwright";
 
-const port = 3011,
+const port = Number(process.env.UI_TEST_PORT ?? 3011),
   base = `http://127.0.0.1:${port}`;
 const server = spawn(
   process.execPath,
@@ -46,6 +46,55 @@ try {
   await page.goto(base, { waitUntil: "networkidle" });
   const main = page.locator("#customer-service"),
     panel = main.locator(".decision-panel");
+  const lookup = main.locator("details").filter({ has: page.getByText("Find equipment by need, Equipment ID or serial number", { exact: true }) });
+  await lookup.locator("summary").click();
+  const units = [
+    ["EQ-1001", "NSR-KX040-001"], ["EQ-1002", "NSR-S66-014"],
+    ["EQ-1003", "NSR-450AJ-008"], ["EQ-1004", "NSR-G70-021"],
+    ["EQ-1005", "NSR-GTH-019"], ["EQ-1006", "NSR-DPU-044"],
+    ["EQ-1007", "NSR-GS2646-032"],
+  ];
+  await page.getByLabel("Equipment list", { exact: true }).waitFor();
+  assert.equal(await page.getByLabel("Equipment list", { exact: true }).locator("option").count(), 8);
+  await page.getByLabel("Decision reason", { exact: true }).fill("Verify equipment selection");
+  await page.getByLabel("Evidence reference", { exact: true }).fill("UI-EQUIPMENT-LIST");
+  for (const [index, [id, serial]] of units.entries()) {
+    await page.getByRole("combobox", { name: /Demo request/ }).selectOption(`REQ-SCN-00${index + 1}`);
+    await page.getByLabel("Equipment list", { exact: true }).selectOption(id);
+    await page.getByRole("button", { name: "Confirm selected equipment", exact: true }).click();
+    const dropdownResult = await panel.innerText();
+    for (const query of [id.toLowerCase().replace("-", " "), serial]) {
+      await page.getByLabel("Equipment lookup", { exact: true }).fill(query);
+      await lookup.getByRole("button", { name: new RegExp(`^${id} ·`) }).click();
+      assert.equal(await panel.innerText(), dropdownResult);
+    }
+  }
+  await page.getByLabel("Equipment lookup", { exact: true }).fill("lift");
+  assert.match(await lookup.innerText(), /Clarify which equipment type/);
+  assert.equal(await lookup.getByRole("button", { name: /confirm request/ }).count(), 2);
+  await page.getByLabel("Equipment lookup", { exact: true }).fill("unknown equipment");
+  assert.match(await lookup.innerText(), /No recorded equipment matches/);
+  assert.equal(await lookup.getByRole("button", { name: /confirm request/ }).count(), 0);
+  await page.getByRole("button", { name: "1 · Ready to rent", exact: true }).click();
+  assert.match(await panel.innerText(), /Rental Ready/);
+  await page.getByRole("button", { name: "2 · Blocked rental", exact: true }).click();
+  assert.match(await panel.innerText(), /Remediation Required/);
+  await page.getByRole("button", { name: "3 · Ready with conditions", exact: true }).click();
+  assert.match(await panel.innerText(), /Rental Ready with Conditions/);
+  console.log("PASS all seven units: dropdown, normalized ID and serial search agree; ambiguous/unmatched search and walkthrough examples");
+  await page.getByRole("button", { name: "1 · Ready to rent", exact: true }).click();
+  await page.getByRole("button", { name: "Protect for four hours", exact: true }).click();
+  await page.getByRole("button", { name: "Approve proposal", exact: true }).click();
+  assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), false);
+  await page.getByLabel("Equipment list", { exact: true }).selectOption("EQ-1002");
+  await page.getByRole("button", { name: "Confirm selected equipment", exact: true }).click();
+  assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
+  assert.match(await main.innerText(), /Skid steer loader/);
+  assert.match(await panel.innerText(), /Remediation Required/);
+  await main.getByText("All matching equipment and allocation history", { exact: true }).click();
+  assert.match(await main.innerText(), /EQ-1002 · Remediation Required/);
+  console.log("PASS changing selected equipment reevaluates readiness and invalidates prior approval");
+  await page.reload({ waitUntil: "networkidle" });
   await page
     .getByLabel("Decision reason", { exact: true })
     .fill("Customer details and equipment confirmed");

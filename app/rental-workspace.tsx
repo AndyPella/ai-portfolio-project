@@ -58,6 +58,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
     "Incomplete" | "Confirmed plan" | "Denied" | "Complete"
   >("Incomplete");
   const [query, setQuery] = useState("");
+  const [lookupId, setLookupId] = useState("");
   const search = query.trim()
     ? findEquipment(state.dataset.equipment, query)
     : null;
@@ -82,6 +83,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           Date.parse(a.expires_at) > Date.parse(now))),
   );
   const equipmentId =
+    request.equipment_id ??
     assigned[0]?.equipment_id ??
     matches.proposal?.equipment_id ??
     matches.results[0]?.equipment_id;
@@ -166,12 +168,27 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
     setMessage("");
     setTaskId("");
     setHoldId("");
+    setQuery("");
+    setLookupId("");
   };
   const isCS = staff.role === "Customer Service",
     isMech = staff.role === "Mechanic",
     isManager = staff.role === "Manager";
   const changeIntake = (key: keyof RentalRequest["intake"], value: string) =>
     setEdit({ ...edit, intake: { ...edit.intake, [key]: value } });
+  const confirmEquipment = (id: string, exact: boolean) => {
+    const asset = state.dataset.equipment.find((e) => e.equipment_id === id)!;
+    const revised = {
+      ...request,
+      equipment_type: asset.equipment_type,
+      equipment_id: exact ? asset.equipment_id : undefined,
+      capabilities: asset.capabilities.split("; "),
+      attachments: asset.required_attachments.split("; "),
+      location: asset.current_location,
+    };
+    setEdit(revised);
+    act({ type: "Update request", request: revised } as WorkflowCommand);
+  };
   return (
     <section
       id="customer-service"
@@ -194,6 +211,35 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         session. Summaries are grounded templates; this demo makes no live AI,
         booking, CRM or dispatch calls.
       </p>
+      <details className="panel walkthrough" id="guided-walkthrough" open>
+        <summary>Guided walkthrough · three rental decisions</summary>
+        <p>Choose an example below. These buttons select a request; they do not approve or confirm a rental. Switching examples keeps session changes. Reload for fresh sample data.</p>
+        <div className="button-row" aria-label="Walkthrough examples">
+          <button className="secondary" onClick={() => { choose("REQ-SCN-001"); setActor("DEMO-CS"); }}>1 · Ready to rent</button>
+          <button className="secondary" onClick={() => { choose("REQ-SCN-002"); setActor("DEMO-CS"); }}>2 · Blocked rental</button>
+          <button className="secondary" onClick={() => { choose("REQ-SCN-004"); setActor("DEMO-CS"); }}>3 · Ready with conditions</button>
+        </div>
+        <p>Start by entering a fictional decision reason and evidence reference under “Record a decision.” Open equipment lookup: search the example’s Equipment ID or serial number and confirm its result, or select the same unit from “Equipment list” and confirm it. Both methods reevaluate the current request’s dates and requirements.</p>
+        {requestId === "REQ-SCN-001" && <div className="walkthrough-steps">
+          <h3>1 · Ready to rent</h3>
+          <p>A customer needs a compact excavator September 8–12, 2026. Select EQ-1001 · serial NSR-KX040-001.</p>
+          <ol><li>Confirm the unit and review the requested dates, customer details, and readiness findings. Expected initial result: Rental Ready.</li><li>As Customer Service, select “Protect for four hours,” then “Approve proposal.”</li><li>After reviewing the customer’s agreement, select “Record customer acceptance.” Expected result: Confirmed. Advancing four hours keeps a confirmed rental allocated.</li></ol>
+        </div>}
+        {requestId === "REQ-SCN-002" && <div className="walkthrough-steps">
+          <h3>2 · Blocked rental</h3>
+          <p>A customer needs a skid steer September 8–10, 2026. Select EQ-1002 · serial NSR-S66-014.</p>
+          <ol><li>Review the missing inspection and active hold. Expected initial result: Remediation Required; rental protection is disabled.</li><li>Select the sample Mechanic role, enter inspection evidence, and use “Record passed demo safety checks.” The hold still requires a separate release.</li><li>Review the selected hold and use “Release selected hold” only after its requirements are satisfied. Expected result: Rental Ready. Return to Customer Service to prepare the rental.</li></ol>
+          <p>If a hold cannot yet be resolved and no eligible alternative exists, return to Customer Service and record a callback with an owner, reviewer, and update time. A callback does not make equipment available.</p>
+        </div>}
+        {requestId === "REQ-SCN-004" && <div className="walkthrough-steps">
+          <h3>3 · Ready with conditions</h3>
+          <p>A customer needs a towable generator September 10–20, 2026. Select EQ-1004 · serial NSR-G70-021.</p>
+          <ol><li>Review the required service window on September 15, 10 AM–noon Pacific. Expected initial result: Rental Ready with Conditions.</li><li>Explain the required service stop and operating restrictions. As Customer Service, protect the equipment and approve the proposal.</li><li>Record customer acceptance only after the customer accepts the disclosed conditions. Expected result: Confirmed with conditions. Acceptance does not complete the service or remove its operating restriction.</li></ol>
+          <p>To explore the other branch, record customer decline instead of acceptance. Expected result: Not Available for this request. Reload before trying the acceptance branch.</p>
+        </div>}
+        {!["REQ-SCN-001", "REQ-SCN-002", "REQ-SCN-004"].includes(requestId) && <p>Select one of the three examples above to view its instructions.</p>}
+        <p className="scope-note">The dates use the simulated September 2026 clock. The equipment list shows recorded units, including unavailable ones; selection alone does not establish readiness. Changing request details clears prior approval, and existing temporary protection must be refreshed before renewed approval.</p>
+      </details>
       <div className="workspace-toolbar">
         <label>
           Demo request
@@ -248,6 +294,15 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             placeholder="I need a generator · eq 1001 · serial number"
           />
         </label>
+        <label>
+          Equipment list
+          <select aria-label="Equipment list" value={lookupId} onChange={(e) => setLookupId(e.target.value)} disabled={!isCS || draft?.status === "Confirmed"}>
+            <option value="">Choose a recorded unit</option>
+            {state.dataset.equipment.map((asset) => <option key={asset.equipment_id} value={asset.equipment_id}>{asset.equipment_id} · {asset.equipment_type} · {asset.serial_number} · {asset.current_location}</option>)}
+          </select>
+        </label>
+        <button className="secondary" disabled={!isCS || !lookupId || draft?.status === "Confirmed"} onClick={() => confirmEquipment(lookupId, true)}>Confirm selected equipment</button>
+        <p className="scope-note">Search or select a unit, then confirm to apply it to the current request. Dates and customer information are retained; inspect the updated requirements before approval.</p>
         {search && (
           <>
             <p>{search.message}</p>
@@ -256,25 +311,8 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 <button
                   className="secondary"
                   key={m.equipment_id}
-                  disabled={!isCS}
-                  onClick={() => {
-                    const asset = state.dataset.equipment.find(
-                      (e) => e.equipment_id === m.equipment_id,
-                    )!;
-                    const revised = {
-                      ...request,
-                      equipment_type: m.equipment_type,
-                      equipment_id: search.exact ? m.equipment_id : undefined,
-                      capabilities: asset.capabilities.split("; "),
-                      attachments: asset.required_attachments.split("; "),
-                      location: m.location,
-                    };
-                    setEdit(revised);
-                    act({
-                      type: "Update request",
-                      request: revised,
-                    } as WorkflowCommand);
-                  }}
+                  disabled={!isCS || draft?.status === "Confirmed"}
+                  onClick={() => confirmEquipment(m.equipment_id, search.exact)}
                 >
                   {search.exact ? m.equipment_id : m.equipment_type} ·{" "}
                   {m.location} · confirm request

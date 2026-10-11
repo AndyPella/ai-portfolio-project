@@ -3,6 +3,10 @@
 .project-links { display: flex; flex-wrap: wrap; gap: 14px 28px; margin-top: 28px; position: relative; z-index: 1; }
 .project-links a { color: var(--lime); line-height: 1.6; text-underline-offset: 4px; }
 .project-links span { font-size: 12px; color: #d5dfda; }
+.walkthrough { scroll-margin-top: 24px; }
+.walkthrough > summary { cursor: pointer; font-size: 20px; font-weight: 700; }
+.walkthrough-steps { border-left: 3px solid var(--green); padding-left: 20px; margin-top: 24px; }
+.walkthrough li { line-height: 1.6; margin: 12px 0; }
 a:focus-visible { outline: 3px solid var(--green); outline-offset: 5px; }
 .hero a:focus-visible { outline-color: var(--lime); }
 .project-story { max-width: 980px; width: 100%; margin: 0 auto; padding: 48px clamp(24px, 5vw, 64px) 72px; }
