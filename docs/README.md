@@ -24,6 +24,11 @@ This directory preserves the evidence used to select, design, build, test, and p
 
 - [Rental Readiness and Service Delay Requirements](requirements/rental-readiness-service-delay-policy.md) — accepted decisions, implemented controls and verification status.
 
+## Bug Tracking
+
+- [Bug workflow](testing/bug-workflow.md) — lightweight process for recording and reviewing bugs and fixes.
+- [Bug log](testing/bug-log.md) — NRE-BUG-001 and NRE-BUG-002; confirmed findings that block PR 17 merge until fixed and verified.
+
 ## Working Dataset
 
 - **Name:** Northstar Ridge Equipment Readiness Demo Data
