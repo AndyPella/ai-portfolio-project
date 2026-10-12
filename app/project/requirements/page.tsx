@@ -8,11 +8,10 @@ export default function RequirementsPage() { return (<article><p className="sect
 <h2>The problem</h2>
 <p>Customer Service needs to determine whether equipment can be offered for a requested rental period, often while a customer waits on the phone.</p>
 <p>Calendar availability is only part of the answer. A rental decision also depends on safety checks, maintenance requirements, active holds, customer information, and operating conditions. The workflow brings these factors together into a recommendation for staff review and customer acceptance.</p>
-<h2>Product ownership and approach</h2>
-<p>Andrew Pella’s contribution covered:</p>
-<ul><li>Business requirements and rental-readiness definitions.</li><li>Exception handling, staff authority, and approval boundaries.</li><li>Scope decisions and implementation priorities.</li><li>Scenario review, acceptance criteria, and evaluation of resulting behavior.</li></ul>
-<p>Concrete customer scenarios exposed dependencies involving maintenance timing, unresolved holds, incomplete paperwork, and changes after approval. These findings informed the requirements and workflow.</p>
-<p>This was an individual project developed with AI assistance. Business reasoning, priorities, scope decisions, and acceptance judgments remained Andrew’s responsibility.</p>
+<h2>Product ownership and business analysis</h2>
+<p>The role combined product management, product ownership, and business analysis, with responsibility for product direction, requirements, scope, and acceptance decisions. The work translated an operational problem into business rules, decision criteria, data requirements, and a usable workflow.</p>
+<p>Product responsibilities included defining the intended experience, prioritizing capabilities, managing scope, and determining whether the implementation met the requirements. Business analysis included mapping process dependencies, examining exceptions, identifying the information needed for rental decisions, and establishing validation criteria.</p>
+<p>AI served as a development tool for exploring options and producing implementation, tests, and documentation.</p>
 <h2>Key decisions</h2>
 <h3>Reduce manual interactions while retaining human approval</h3>
 <p>The workflow consolidates equipment selection, maintenance and hold checks, rental-date comparisons, and required conditions. The goal is to reduce the manual interactions needed to reach critical information.</p>
