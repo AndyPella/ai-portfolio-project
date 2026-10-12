@@ -44,250 +44,112 @@ try {
     errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(base, { waitUntil: "networkidle" });
-  const main = page.locator("#customer-service"),
-    panel = main.locator(".decision-panel");
-  const lookup = main.locator("details").filter({ has: page.getByText("Find equipment by need, Equipment ID or serial number", { exact: true }) });
+
+  const main = page.locator("#customer-service"), panel = main.locator(".decision-panel");
+  const nav = async name => page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name, exact: true }).click();
+  const role = async id => page.getByRole("combobox", { name: /Acting staff/ }).selectOption(id);
+  const scenario = async id => page.getByRole("combobox", { name: /Demo request/ }).selectOption(id);
+  const fresh = async () => page.reload({ waitUntil: "networkidle" });
+  const record = async name => {
+    await page.getByRole("button", { name, exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.waitFor();
+    await dialog.getByLabel("Decision reason", { exact: true }).fill("Reviewed fictional scenario and required evidence");
+    await dialog.getByLabel("Evidence reference", { exact: true }).fill("UI-SMOKE-EVIDENCE");
+    await dialog.getByRole("button", { name: "Confirm action", exact: true }).click();
+    await dialog.waitFor({ state: "detached" });
+  };
+  const lookup = main.locator("details").filter({ has: page.getByText("Change equipment · search or equipment list", { exact: true }) });
+  assert.equal(await page.getByRole("button", { name: "Record passed demo safety checks", exact: true }).isVisible(), false);
+  await nav("Customer & request");
+  await page.getByText("Edit shared intake and rental details", { exact: true }).click();
+  await page.getByLabel(/Delivery \/ pickup notes/).fill("Retained unsaved delivery note");
+  await nav("Equipment & readiness");
+  await role("DEMO-MECH");
+  assert.equal(await page.getByRole("button", { name: "Record passed demo safety checks", exact: true }).isVisible(), true);
+  assert.equal(await page.getByRole("button", { name: "Reconcile conflicting records", exact: true }).isVisible(), false);
+  assert.equal(await page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name: "Customer & request", exact: true }).count(), 0);
+  await role("DEMO-MGR");
+  assert.equal(await page.getByRole("button", { name: "Reconcile conflicting records", exact: true }).isVisible(), true);
+  assert.equal(await page.getByRole("navigation", { name: "Rental functions" }).getByRole("button").count(), 4);
+  await role("DEMO-CS");
+  assert.equal(await page.getByLabel(/Delivery \/ pickup notes/).inputValue(), "Retained unsaved delivery note");
+  console.log("PASS role-specific visibility, manager sections and retained draft context");
+  await fresh();
+  await nav("Equipment & readiness");
   await lookup.locator("summary").click();
-  const units = [
-    ["EQ-1001", "NSR-KX040-001"], ["EQ-1002", "NSR-S66-014"],
-    ["EQ-1003", "NSR-450AJ-008"], ["EQ-1004", "NSR-G70-021"],
-    ["EQ-1005", "NSR-GTH-019"], ["EQ-1006", "NSR-DPU-044"],
-    ["EQ-1007", "NSR-GS2646-032"],
-  ];
-  await page.getByLabel("Equipment list", { exact: true }).waitFor();
+  const units = [["EQ-1001", "NSR-KX040-001"], ["EQ-1002", "NSR-S66-014"], ["EQ-1003", "NSR-450AJ-008"], ["EQ-1004", "NSR-G70-021"], ["EQ-1005", "NSR-GTH-019"], ["EQ-1006", "NSR-DPU-044"], ["EQ-1007", "NSR-GS2646-032"]];
   assert.equal(await page.getByLabel("Equipment list", { exact: true }).locator("option").count(), 8);
-  await page.getByLabel("Decision reason", { exact: true }).fill("Verify equipment selection");
-  await page.getByLabel("Evidence reference", { exact: true }).fill("UI-EQUIPMENT-LIST");
-  for (const [index, [id, serial]] of units.entries()) {
-    await page.getByRole("combobox", { name: /Demo request/ }).selectOption(`REQ-SCN-00${index + 1}`);
+  for (const [i, [id, serial]] of units.entries()) {
+    await scenario(`REQ-SCN-00${i + 1}`);
     await page.getByLabel("Equipment list", { exact: true }).selectOption(id);
-    await page.getByRole("button", { name: "Confirm selected equipment", exact: true }).click();
-    const dropdownResult = await panel.innerText();
+    await record("Confirm selected equipment");
+    const expected = await panel.innerText();
     for (const query of [id.toLowerCase().replace("-", " "), serial]) {
       await page.getByLabel("Equipment lookup", { exact: true }).fill(query);
       await lookup.getByRole("button", { name: new RegExp(`^${id} ·`) }).click();
-      assert.equal(await panel.innerText(), dropdownResult);
+      await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
+      assert.equal(await panel.innerText(), expected);
     }
   }
   await page.getByLabel("Equipment lookup", { exact: true }).fill("lift");
   assert.match(await lookup.innerText(), /Clarify which equipment type/);
-  assert.equal(await lookup.getByRole("button", { name: /confirm request/ }).count(), 2);
   await page.getByLabel("Equipment lookup", { exact: true }).fill("unknown equipment");
   assert.match(await lookup.innerText(), /No recorded equipment matches/);
-  assert.equal(await lookup.getByRole("button", { name: /confirm request/ }).count(), 0);
-  await page.getByRole("button", { name: "1 · Ready to rent", exact: true }).click();
-  assert.match(await panel.innerText(), /Rental Ready/);
-  await page.getByRole("button", { name: "2 · Blocked rental", exact: true }).click();
-  assert.match(await panel.innerText(), /Remediation Required/);
-  await page.getByRole("button", { name: "3 · Ready with conditions", exact: true }).click();
-  assert.match(await panel.innerText(), /Rental Ready with Conditions/);
-  console.log("PASS all seven units: dropdown, normalized ID and serial search agree; ambiguous/unmatched search and walkthrough examples");
-  await page.getByRole("button", { name: "1 · Ready to rent", exact: true }).click();
-  await page.getByRole("button", { name: "Protect for four hours", exact: true }).click();
-  await page.getByRole("button", { name: "Approve proposal", exact: true }).click();
-  assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), false);
-  await page.getByLabel("Equipment list", { exact: true }).selectOption("EQ-1002");
-  await page.getByRole("button", { name: "Confirm selected equipment", exact: true }).click();
-  assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
-  assert.match(await main.innerText(), /Skid steer loader/);
-  assert.match(await panel.innerText(), /Remediation Required/);
-  await main.getByText("All matching equipment and allocation history", { exact: true }).click();
-  assert.match(await main.innerText(), /EQ-1002 · Remediation Required/);
-  console.log("PASS changing selected equipment reevaluates readiness and invalidates prior approval");
-  await page.reload({ waitUntil: "networkidle" });
-  await page
-    .getByLabel("Decision reason", { exact: true })
-    .fill("Customer details and equipment confirmed");
-  await page
-    .getByLabel("Evidence reference", { exact: true })
-    .fill("UI-SMOKE-EVIDENCE");
-  await page
-    .getByRole("button", { name: "Protect for four hours", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Approve proposal", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Record customer acceptance", exact: true })
-    .click();
-  await page
-    .getByRole("status")
-    .filter({ hasText: "Accept recorded" })
-    .waitFor();
-  assert.match(await panel.innerText(), /Confirmed/);
-  assert.match(
-    await panel.innerText(),
-    /Rental confirmed for your requested dates/,
-  );
-  await page
-    .getByRole("button", { name: "Advance four hours", exact: true })
-    .click();
-  assert.match(await panel.innerText(), /EQ-1001 · Confirmed/);
-  console.log(
-    "PASS existing-customer approval, acceptance and confirmed timer retention",
-  );
-  await page
-    .getByRole("combobox", { name: /Demo request/ })
-    .selectOption("REQ-SCN-004");
-  assert.match(await panel.innerText(), /Rental Ready with Conditions/);
-  assert.match(await panel.innerText(), /Sep 15, 2026, 10:00 AM Pacific/);
-  assert.doesNotMatch(await panel.innerText(), /2026-09-15T10:00:00/);
-  await page
-    .getByRole("button", { name: "Protect for four hours", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Record customer decline", exact: true })
-    .click();
-  await page
-    .getByRole("status")
-    .filter({ hasText: "Decline conditions recorded" })
-    .waitFor();
-  assert.match(await panel.innerText(), /Not Available/);
-  console.log("PASS service disclosure and recorded customer decline");
-  await page.reload({ waitUntil: "networkidle" });
-  await page
-    .getByRole("combobox", { name: /Demo request/ })
-    .selectOption("REQ-SCN-004");
-  await page
-    .getByLabel("Decision reason", { exact: true })
-    .fill("Customer accepts disclosed service stop");
-  await page
-    .getByLabel("Evidence reference", { exact: true })
-    .fill("UI-SMOKE-SERVICE-ACCEPTANCE");
-  for (const name of [
-    "Protect for four hours",
-    "Approve proposal",
-    "Record customer acceptance",
-  ]) {
+  console.log("PASS seven-unit dropdown, ID and serial equivalence; ambiguous and unmatched search");
+  await fresh();
+  await page.locator("#guided-walkthrough summary").click();
+  for (const [name, id] of [["1 · Ready to rent", "EQ-1001"], ["2 · Blocked rental", "EQ-1002"], ["3 · Ready with conditions", "EQ-1004"]]) {
     await page.getByRole("button", { name, exact: true }).click();
+    assert.match(await main.locator(".rental-context").innerText(), new RegExp(id));
   }
-  assert.match(
-    await panel.innerText(),
-    /Rental confirmed\. Required service\/replacement conditions have been accepted/,
-  );
-  assert.doesNotMatch(await panel.innerText(), /Confirm customer acceptance/);
+  console.log("PASS examples load request and equipment without redundant selection");
+  await fresh();
+  await nav("Agreement & confirmation");
+  await page.getByRole("button", { name: "Protect for four hours", exact: true }).click();
+  await page.getByRole("dialog").waitFor();
+  assert.equal(await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).isDisabled(), true);
+  await page.keyboard.press("Escape");
+  assert.equal(await page.getByRole("dialog").count(), 0);
+  for (const name of ["Protect for four hours", "Approve proposal", "Record customer acceptance"]) await record(name);
+  assert.match(await panel.innerText(), /EQ-1001 · Confirmed/);
+  await page.getByRole("button", { name: "Advance four hours", exact: true }).click();
+  assert.match(await panel.innerText(), /EQ-1001 · Confirmed/);
+  console.log("PASS action-specific evidence, Escape cancellation and confirmed allocation retention");
+  await fresh();await scenario("REQ-SCN-004");await nav("Agreement & confirmation");
+  assert.match(await panel.innerText(), /Sep 15, 2026, 10:00 AM Pacific/);
+  for (const name of ["Protect for four hours", "Approve proposal", "Record customer acceptance"]) await record(name);
+  assert.match(await panel.innerText(), /Rental confirmed\. Required service\/replacement conditions have been accepted/);
   await panel.locator("details summary").click();
-  assert.match(
-    await panel.innerText(),
-    /Customer acceptance recorded\. Required service stop remains in force/,
-  );
-  console.log(
-    "PASS readable service times and confirmation wording after acceptance",
-  );
-  await page
-    .getByRole("combobox", { name: /Demo request/ })
-    .selectOption("REQ-SCN-002");
-  assert.match(await panel.innerText(), /Remediation Required/);
-  await page
-    .getByRole("combobox", { name: /Acting staff/ })
-    .selectOption("DEMO-MECH");
-  await page
-    .getByRole("button", {
-      name: "Record passed demo safety checks",
-      exact: true,
-    })
-    .click();
-  await page
-    .getByRole("status")
-    .filter({ hasText: "Pass inspection recorded" })
-    .waitFor();
-  await page
-    .getByRole("button", { name: "Release selected hold", exact: true })
-    .click();
-  await page
-    .getByRole("status")
-    .filter({ hasText: "Release hold recorded" })
-    .waitFor();
-  assert.match(await panel.innerText(), /Rental Ready/);
-  await page
-    .getByRole("combobox", { name: /Acting staff/ })
-    .selectOption("DEMO-CS");
-  await page
-    .getByRole("button", { name: "Protect for four hours", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Advance four hours", exact: true })
-    .click();
-  await main
-    .locator("details")
-    .filter({
-      has: page.getByText("All matching equipment and allocation history", {
-        exact: true,
-      }),
-    })
-    .locator("summary")
-    .click();
-  assert.match(await main.innerText(), /Expired/);
-  assert.equal(
-    await page
-      .getByRole("button", { name: "Record customer acceptance", exact: true })
-      .isDisabled(),
-    true,
-  );
-  console.log(
-    "PASS qualified inspection, routine release and exact four-hour expiry",
-  );
-  await page
-    .getByRole("button", { name: "Protect for four hours", exact: true })
-    .click();
-  const acceptance = page.getByRole("button", {
-    name: "Record customer acceptance",
-    exact: true,
-  });
-  assert.equal(await acceptance.isDisabled(), true);
-  await page
-    .getByRole("button", { name: "Approve proposal", exact: true })
-    .click();
-  assert.equal(await acceptance.isDisabled(), false);
-  await acceptance.click();
-  assert.match(await panel.innerText(), /EQ-1002 · Confirmed/);
-  console.log(
-    "PASS renewed protection requires fresh staff approval before enabling acceptance",
-  );
-  await page
-    .getByRole("combobox", { name: /Demo request/ })
-    .selectOption("REQ-SCN-007");
-  assert.match(await panel.innerText(), /Required site documentation: Pending/);
-  assert.equal(
-    await page
-      .getByRole("button", { name: "Record customer acceptance", exact: true })
-      .isDisabled(),
-    true,
-  );
-  console.log(
-    "PASS customer documentation gate remains separate from equipment readiness",
-  );
-  await page.evaluate(() =>
-    window.scrollTo(0, document.querySelector("#customer-service").offsetTop),
-  );
-  if (process.env.UI_SCREENSHOT_DIR)
-    await page.screenshot({
-      path: process.env.UI_SCREENSHOT_DIR + "/desktop.png",
-    });
-  assert.equal(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth,
-    ),
-    false,
-  );
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(() =>
-    window.scrollTo(0, document.querySelector("#customer-service").offsetTop),
-  );
-  if (process.env.UI_SCREENSHOT_DIR)
-    await page.screenshot({
-      path: process.env.UI_SCREENSHOT_DIR + "/mobile.png",
-    });
-  assert.equal(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth,
-    ),
-    false,
-  );
-  assert.deepEqual(errors, []);
-  console.log(
-    "PASS desktop/mobile layout, no horizontal overflow, no browser page errors",
-  );
+  assert.match(await panel.innerText(), /Customer acceptance recorded/);
+  await fresh();await scenario("REQ-SCN-004");await nav("Agreement & confirmation");await record("Record customer decline");
+  assert.match(await panel.innerText(), /Not Available/);
+  console.log("PASS service disclosure, acceptance and decline branches");
+  await fresh();await scenario("REQ-SCN-002");await nav("Equipment & readiness");assert.match(await panel.innerText(), /Remediation Required/);
+  await role("DEMO-MECH");await record("Record passed demo safety checks");
+  await nav("Equipment & readiness");assert.match(await panel.innerText(), /Remediation Required/);
+  await nav("Review & resolution");await record("Release selected hold");
+  await nav("Equipment & readiness");assert.match(await panel.innerText(), /Rental Ready/);
+  await role("DEMO-CS");await nav("Agreement & confirmation");await record("Protect for four hours");await record("Approve proposal");
+  await page.getByRole("button", { name: "Advance four hours", exact: true }).click();
+  assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
+  await record("Protect for four hours");assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
+  await record("Approve proposal");await record("Record customer acceptance");assert.match(await panel.innerText(), /EQ-1002 · Confirmed/);
+  console.log("PASS qualified inspection, separate hold release, expiry and fresh approval");
+  await fresh();await nav("Agreement & confirmation");await record("Protect for four hours");await record("Approve proposal");
+  await nav("Equipment & readiness");await lookup.locator("summary").click();await page.getByLabel("Equipment list", { exact: true }).selectOption("EQ-1002");await record("Confirm selected equipment");
+  assert.match(await panel.innerText(), /Remediation Required/);await nav("Agreement & confirmation");assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
+  await fresh();await scenario("REQ-SCN-007");await nav("Agreement & confirmation");await record("Protect for four hours");await record("Approve proposal");assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
+  console.log("PASS changed selection invalidates approval; customer paperwork remains a separate gate");
+  for (const width of [1440,390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const section of ["Customer & request","Equipment & readiness","Agreement & confirmation","Review & resolution"]) {await nav(section);assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false);}
+    await nav("Equipment & readiness");
+    await page.evaluate(() => document.querySelector(".rental-context").scrollIntoView());
+    if(process.env.UI_SCREENSHOT_DIR)await page.screenshot({path:process.env.UI_SCREENSHOT_DIR+`/workspace-${width}.png`});
+  }
+  assert.deepEqual(errors,[]);
+  console.log("PASS desktop/mobile sections, no horizontal overflow or browser errors");
 } catch (error) {
   console.error(output);
   throw error;

@@ -1,6 +1,6 @@
 # Rental workspace UI decisions
 
-Approved October 12, 2026. This work follows PR 17 and is isolated in a separate UI redesign PR. Implementation is pending.
+Approved October 12, 2026. This work follows PR 17 and is isolated in a separate UI redesign PR. Implemented in this PR; user acceptance review is pending.
 
 ## Purpose
 
@@ -53,3 +53,13 @@ Switching sample roles preserves the current request, selected equipment and dra
 - Do not implement live AI, production authentication, early temporary-allocation release or new customer-system integration in this redesign.
 - NRE-BUG-001 and NRE-BUG-002 remain Open and unfixed as previously requested.
 - PR 17 remains unmerged until explicitly authorized. The new PR initially targets its branch so only the UI changes appear in review; after PR 17 merges, retarget to main as appropriate.
+
+## Implementation and verification
+
+Implemented four navigable workspace sections with a persistent rental summary, contextual next-action guidance and optional sample requests. Section and role changes retain form state. Customer Service has customer/agreement controls and callback routing; mechanics have equipment and qualified resolution controls; managers see all sections and manager review fields. Existing domain authorization is unchanged, so visibility does not confer permission to perform another role's action.
+
+Equipment lookup is optional when a sample request already proposes a unit. Search and list confirmation share the existing update path. Reason and evidence are requested in an action-specific confirmation dialog, with cancellation and keyboard focus handling. Landing role links select the matching sample role.
+
+Validation: production build (including type checks), lint, all 75 domain tests, and updated browser smoke checks passed. Browser coverage includes retained unsaved entries across role/section changes; role visibility; seven-unit search/list equivalence; ambiguous and unmatched searches; sample requests; evidence confirmation/cancellation; confirmed allocation retention; service acceptance/decline; inspection and separate hold release; expiry and renewed approval; changed equipment; customer paperwork; desktop/mobile layouts without overflow or page errors.
+
+No domain rules, dependencies, fictional dataset, or known-bug fixes were changed. User review of the combined PR 17/18 demo remains pending.

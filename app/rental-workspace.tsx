@@ -57,6 +57,9 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   const [reviewStatus, setReviewStatus] = useState<
     "Incomplete" | "Confirmed plan" | "Denied" | "Complete"
   >("Incomplete");
+  type View = "customer" | "equipment" | "agreement" | "resolution";
+  const [view, setView] = useState<View>("customer");
+  const [pending, setPending] = useState<Omit<WorkflowCommand, "actor" | "reason" | "evidence"> | null>(null);
   const [query, setQuery] = useState("");
   const [lookupId, setLookupId] = useState("");
   const search = query.trim()
@@ -127,7 +130,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
     (s) => s.staff_id === actor,
   )!;
   const callbacks = state.callbacks.filter((c) => c.request_id === requestId);
-  const act = (
+  const perform = (
     command: Omit<WorkflowCommand, "actor" | "reason" | "evidence">,
   ) => {
     try {
@@ -146,6 +149,29 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
       );
     }
   };
+  const act = (command: Omit<WorkflowCommand, "actor" | "reason" | "evidence">) => setPending(command);
+  useEffect(() => {
+    const selectEntry = () => {
+      if (window.location.hash === "#mechanic") { setActor("DEMO-MECH"); setView("resolution"); }
+      if (window.location.hash === "#customer-service") { setActor("DEMO-CS"); setView("customer"); }
+    };
+    selectEntry();
+    window.addEventListener("hashchange", selectEntry);
+    return () => window.removeEventListener("hashchange", selectEntry);
+  }, []);
+  useEffect(() => {
+    if (!pending) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setPending(null); return; }
+      if (event.key !== "Tab") return;
+      const controls = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"] input, [role="dialog"] button:not(:disabled)'));
+      const first = controls[0], last = controls.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [pending]);
   useEffect(() => {
     const timer = setInterval(
       () => setNow((n) => new Date(Date.parse(n) + 30000).toISOString()),
@@ -174,6 +200,24 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   const isCS = staff.role === "Customer Service",
     isMech = staff.role === "Mechanic",
     isManager = staff.role === "Manager";
+  const canCustomer = isCS || isManager;
+  const canResolve = isMech || isManager || staff.role === "Inspector";
+  const visibleViews: View[] = canCustomer ? ["customer", "equipment", "agreement", "resolution"] : ["equipment", "resolution"];
+  const currentView = visibleViews.includes(view) ? view : "equipment";
+  const titles: Record<View, string> = { customer: "Customer & request", equipment: "Equipment & readiness", agreement: "Agreement & confirmation", resolution: "Review & resolution" };
+  const guidance: Record<View, string> = {
+    customer: "Review the customer, dates and expected use. Save changes before reviewing equipment.",
+    equipment: "Review the selected unit and readiness findings. Change equipment only when needed; selection does not establish readiness.",
+    agreement: "Review required checks and conditions, protect the equipment, approve the proposal, then record customer acceptance.",
+    resolution: canResolve ? "Record qualified inspections or maintenance evidence and review holds. Work completion and hold release are separate actions." : "Arrange an owned callback when qualified review is needed. Maintenance findings remain visible in Equipment & readiness."
+  };
+  const nextStep = draft?.status === "Confirmed" ? "Rental confirmed. Review the recorded agreement and any continuing conditions."
+    : result && !isReady(result) ? canResolve ? "Review the blocker and record the qualified resolution evidence." : "Review the blocker. Request qualified resolution or arrange a callback."
+    : checks.length ? "Complete the required customer checks before acceptance."
+    : !assigned.length || assigned.some(a => a.scope !== requestScope(request)) ? "Protect the selected equipment for four hours."
+    : !draft?.approved_scope ? "Review the proposal and record staff approval."
+    : "Review customer acceptance, including all displayed conditions, before confirming.";
+  const openExample = (id: string) => { choose(id); setActor("DEMO-CS"); setView("customer"); setPending(null); };
   const changeIntake = (key: keyof RentalRequest["intake"], value: string) =>
     setEdit({ ...edit, intake: { ...edit.intake, [key]: value } });
   const confirmEquipment = (id: string, exact: boolean) => {
@@ -198,7 +242,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
       <div className="workspace-heading">
         <div>
           <p className="section-kicker">Workspace 01</p>
-          <h2 id="workspace-title">Customer Service</h2>
+          <h2 id="workspace-title">Rental workspace</h2>
           <p>
             Find an eligible unit, resolve required checks, and prepare the
             rental agreement.
@@ -211,39 +255,20 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         session. Summaries are grounded templates; this demo makes no live AI,
         booking, CRM or dispatch calls.
       </p>
-      <details className="panel walkthrough" id="guided-walkthrough" open>
-        <summary>Guided walkthrough · three rental decisions</summary>
-        <p>Choose an example below. These buttons select a request; they do not approve or confirm a rental. Switching examples keeps session changes. Reload for fresh sample data.</p>
-        <div className="button-row" aria-label="Walkthrough examples">
-          <button className="secondary" onClick={() => { choose("REQ-SCN-001"); setActor("DEMO-CS"); }}>1 · Ready to rent</button>
-          <button className="secondary" onClick={() => { choose("REQ-SCN-002"); setActor("DEMO-CS"); }}>2 · Blocked rental</button>
-          <button className="secondary" onClick={() => { choose("REQ-SCN-004"); setActor("DEMO-CS"); }}>3 · Ready with conditions</button>
+      <details className="panel walkthrough" id="guided-walkthrough">
+        <summary>Explore a sample rental</summary>
+        <p>Load a sample request and its proposed equipment, then use the workspace sections below. Switching examples retains session changes; reload restores the original data.</p>
+        <div className="button-row">
+          <button className="secondary" onClick={() => openExample("REQ-SCN-001")}>1 · Ready to rent</button>
+          <button className="secondary" onClick={() => openExample("REQ-SCN-002")}>2 · Blocked rental</button>
+          <button className="secondary" onClick={() => openExample("REQ-SCN-004")}>3 · Ready with conditions</button>
         </div>
-        <p>Start by entering a fictional decision reason and evidence reference under “Record a decision.” Open equipment lookup: search the example’s Equipment ID or serial number and confirm its result, or select the same unit from “Equipment list” and confirm it. Both methods reevaluate the current request’s dates and requirements.</p>
-        {requestId === "REQ-SCN-001" && <div className="walkthrough-steps">
-          <h3>1 · Ready to rent</h3>
-          <p>A customer needs a compact excavator September 8–12, 2026. Select EQ-1001 · serial NSR-KX040-001.</p>
-          <ol><li>Confirm the unit and review the requested dates, customer details, and readiness findings. Expected initial result: Rental Ready.</li><li>As Customer Service, select “Protect for four hours,” then “Approve proposal.”</li><li>After reviewing the customer’s agreement, select “Record customer acceptance.” Expected result: Confirmed. Advancing four hours keeps a confirmed rental allocated.</li></ol>
-        </div>}
-        {requestId === "REQ-SCN-002" && <div className="walkthrough-steps">
-          <h3>2 · Blocked rental</h3>
-          <p>A customer needs a skid steer September 8–10, 2026. Select EQ-1002 · serial NSR-S66-014.</p>
-          <ol><li>Review the missing inspection and active hold. Expected initial result: Remediation Required; rental protection is disabled.</li><li>Select the sample Mechanic role, enter inspection evidence, and use “Record passed demo safety checks.” The hold still requires a separate release.</li><li>Review the selected hold and use “Release selected hold” only after its requirements are satisfied. Expected result: Rental Ready. Return to Customer Service to prepare the rental.</li></ol>
-          <p>If a hold cannot yet be resolved and no eligible alternative exists, return to Customer Service and record a callback with an owner, reviewer, and update time. A callback does not make equipment available.</p>
-        </div>}
-        {requestId === "REQ-SCN-004" && <div className="walkthrough-steps">
-          <h3>3 · Ready with conditions</h3>
-          <p>A customer needs a towable generator September 10–20, 2026. Select EQ-1004 · serial NSR-G70-021.</p>
-          <ol><li>Review the required service window on September 15, 10 AM–noon Pacific. Expected initial result: Rental Ready with Conditions.</li><li>Explain the required service stop and operating restrictions. As Customer Service, protect the equipment and approve the proposal.</li><li>Record customer acceptance only after the customer accepts the disclosed conditions. Expected result: Confirmed with conditions. Acceptance does not complete the service or remove its operating restriction.</li></ol>
-          <p>To explore the other branch, record customer decline instead of acceptance. Expected result: Not Available for this request. Reload before trying the acceptance branch.</p>
-        </div>}
-        {!["REQ-SCN-001", "REQ-SCN-002", "REQ-SCN-004"].includes(requestId) && <p>Select one of the three examples above to view its instructions.</p>}
-        <p className="scope-note">The dates use the simulated September 2026 clock. The equipment list shows recorded units, including unavailable ones; selection alone does not establish readiness. Changing request details clears prior approval, and existing temporary protection must be refreshed before renewed approval.</p>
+        <p>Ready: EQ-1001, September 8–12. Blocked: EQ-1002, September 8–10, requiring inspection and separate hold release. Conditions: EQ-1004, September 10–20, with service September 15, 10 AM–noon Pacific.</p>
       </details>
-      <div className="workspace-toolbar">
+      <div className="workspace-toolbar" inert={pending ? true : undefined}>
         <label>
           Demo request
-          <select value={requestId} onChange={(e) => choose(e.target.value)}>
+          <select value={requestId} onChange={(e) => { choose(e.target.value); setPending(null); }}>
             {source.demo_scenarios.map((s, i) => (
               <option
                 key={s.scenario_id}
@@ -256,7 +281,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         </label>
         <label>
           Acting staff
-          <select value={actor} onChange={(e) => setActor(e.target.value)}>
+          <select value={actor} onChange={(e) => { setActor(e.target.value); setPending(null); setView(e.target.value === "DEMO-CS" ? "customer" : "resolution"); }}>
             {state.dataset.rental_workflow.staff.map((s) => (
               <option key={s.staff_id} value={s.staff_id}>
                 {s.name} · {s.role}
@@ -284,8 +309,25 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
       >
         {message}
       </div>
-      <details className="panel">
-        <summary>Find equipment by need, Equipment ID or serial number</summary>
+      <div className="rental-context" aria-label="Current rental summary">
+        <div><small>Customer</small><strong>{request.intake.renter_name}</strong></div>
+        <div><small>Rental dates · Pacific</small><strong>{stamp(request.pickup)} → {stamp(request.return_at)}</strong></div>
+        <div><small>Selected equipment</small><strong>{equipmentId ?? "No unit selected"} · {request.equipment_type}</strong></div>
+        <div><small>Current status</small><strong>{draft?.status === "Confirmed" ? "Confirmed" : result?.outcome ?? "Needs review"}</strong></div>
+      </div>
+      <nav className="workspace-navigation" aria-label="Rental functions">
+        {visibleViews.map(id => <button key={id} className={currentView === id ? "" : "secondary"} aria-current={currentView === id ? "page" : undefined} onClick={() => setView(id)}>{titles[id]}</button>)}
+      </nav>
+      <div className="section-guidance">
+        <h3>{titles[currentView]}</h3><p>{guidance[currentView]}</p>
+        <p><strong>Next action:</strong> {nextStep}</p>
+        {currentView === "customer" && <button onClick={() => setView("equipment")}>Review equipment readiness</button>}
+        {currentView === "equipment" && canCustomer && result && isReady(result) && <button onClick={() => setView("agreement")}>Prepare rental agreement</button>}
+        {currentView === "equipment" && result && !isReady(result) && <button onClick={() => setView("resolution")}>Review resolution options</button>}
+        {currentView === "resolution" && <button className="secondary" onClick={() => setView("equipment")}>Return to readiness</button>}
+      </div>
+      <details className="panel" hidden={currentView !== "equipment" || !canCustomer}>
+        <summary>Change equipment · search or equipment list</summary>
         <label>
           Equipment lookup
           <input
@@ -322,33 +364,17 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           </>
         )}
       </details>
-      <section className="panel evidence-input">
-        <h3>Record a decision</h3>
-        <p>
-          Every staff action requires a reason and supporting evidence. Choose
-          the appropriate sample role above.
-        </p>
-        <div className="form-grid">
-          <label>
-            Decision reason
-            <input
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="What was checked or agreed?"
-            />
-          </label>
-          <label>
-            Evidence reference
-            <input
-              value={evidence}
-              onChange={(e) => setEvidence(e.target.value)}
-              placeholder="Inspection, work or customer acceptance reference"
-            />
-          </label>
-        </div>
-      </section>
-      <div className="workspace-grid">
-        <section className="panel">
+      {pending && <div className="decision-dialog-backdrop">
+        <section role="dialog" aria-modal="true" aria-labelledby="decision-title" className="panel decision-dialog">
+          <h3 id="decision-title">Record evidence · {pending.type}</h3>
+          <p>Acting as {staff.name} · {staff.role}. Record why this action is appropriate and its supporting evidence. Sample references are sufficient for this fictional demo.</p>
+          <label>Decision reason<input autoFocus value={reason} onChange={e => setReason(e.target.value)} /></label>
+          <label>Evidence reference<input value={evidence} onChange={e => setEvidence(e.target.value)} /></label>
+          <div className="button-row"><button disabled={!reason.trim() || !evidence.trim()} onClick={() => { perform(pending); setPending(null); }}>Confirm action</button><button className="secondary" onClick={() => setPending(null)}>Back without recording</button></div>
+        </section>
+      </div>}
+      <div className="workspace-grid workspace-sections">
+        <section className="panel" hidden={!canCustomer || (currentView !== "customer" && currentView !== "agreement")}>
           <p className="section-kicker">Rental request</p>
           <h3>{request.equipment_type}</h3>
           <p>
@@ -377,7 +403,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 ? "Resolve the match before confirmation."
                 : "Confirm the existing customer match."}
           </p>
-          <details>
+          <details hidden={currentView !== "customer"}>
             <summary>Edit shared intake and rental details</summary>
             <div className="form-grid">
               {(
@@ -586,9 +612,9 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             ))}
           </details>
         </section>
-        <section className="panel decision-panel">
-          <p className="section-kicker">Automatically proposed equipment</p>
-          <h3>{matches.proposal?.equipment_id ?? "No qualifying unit"}</h3>
+        <section className="panel decision-panel" hidden={currentView !== "equipment" && currentView !== "agreement"}>
+          <p className="section-kicker">Selected equipment</p>
+          <h3>{equipmentId ?? "No unit selected"}</h3>
           {result && (
             <>
               <span
@@ -622,8 +648,8 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                     ? "In-time · up to five days before pickup"
                     : "Advance request"}
                 </dd>
-                <dt>Customer verification</dt>
-                <dd>
+                <dt hidden={!canCustomer}>Customer verification</dt>
+                <dd hidden={!canCustomer}>
                   {checks.length
                     ? checks.join("; ")
                     : "Required checks verified"}
@@ -647,6 +673,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                     <p key={c}>{readableTimes(c)}</p>
                   ))}
                   <button
+                    hidden={!canCustomer || currentView !== "agreement"}
                     className="secondary"
                     disabled={!isCS || draft?.status === "Confirmed"}
                     onClick={() =>
@@ -669,7 +696,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                     agreed rental charge applies.
                   </p>
                 ))}
-              <div className="button-row">
+              <div className="button-row" hidden={!canCustomer || currentView !== "agreement"}>
                 <button
                   disabled={
                     !isCS ||
@@ -777,9 +804,9 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         </section>
       </div>
 
-      <section id="mechanic" className="panel">
-        <p className="section-kicker">Workspace 02 · scoped resolution</p>
-        <h3>Mechanic</h3>
+      <section id="mechanic" className="panel" hidden={currentView !== "resolution" || !canResolve}>
+        <p className="section-kicker">Maintenance & holds</p>
+        <h3>Equipment resolution</h3>
         <p>
           Complete work and certify checks within recorded qualifications. Holds
           stay active until an authorized release passes the rules.
@@ -835,6 +862,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         )}
         <div className="button-row">
           <button
+            hidden={!(isMech || isManager)}
             disabled={!isMech || !selectedTask}
             onClick={() =>
               act({
@@ -846,6 +874,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             Record verified work completion
           </button>
           <button
+            hidden={!canResolve}
             disabled={!(isMech || staff.role === "Inspector") || !equipmentId}
             onClick={() =>
               act({
@@ -862,6 +891,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             Record passed demo safety checks
           </button>
           <button
+            hidden={!isManager}
             className="secondary"
             disabled={!isManager || !equipmentId}
             onClick={() =>
@@ -874,6 +904,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             Reconcile conflicting records
           </button>
           <button
+            hidden={!(isMech || isManager)}
             disabled={!selectedHold || !(isMech || isManager)}
             onClick={() =>
               act({
@@ -886,6 +917,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           </button>
           <button
             className="secondary"
+            hidden={!(isMech || isManager)}
             disabled={!(isMech || isManager) || !equipmentId}
             onClick={() =>
               act({
@@ -923,6 +955,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             </label>
           </div>
           <button
+            hidden={!(isMech || isManager)}
             disabled={!isMech || !selectedTask}
             onClick={() =>
               act({
@@ -949,14 +982,14 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             still satisfy the rules. A plan never records completion.
           </p>
           <div className="form-grid">
-            <label>
+            <label hidden={!isManager}>
               Deferred service · ISO timestamp
               <input
                 value={serviceAt}
                 onChange={(e) => setServiceAt(e.target.value)}
               />
             </label>
-            <label>
+            <label hidden={!isManager}>
               Projected meter at service
               <input
                 type="number"
@@ -966,6 +999,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             </label>
           </div>
           <button
+            hidden={!isManager}
             disabled={!isManager || !selectedTask}
             onClick={() =>
               act({
@@ -984,7 +1018,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             whichever comes first. Warranty/task limits take precedence.
           </p>
         </details>
-        <details>
+        <details hidden={!isManager}>
           <summary>Confirmed replacement plan</summary>
           <p>
             Both units must qualify for their rental segments. Usage windows and
@@ -1052,14 +1086,14 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           </button>
         </details>
       </section>
-      <section className="panel">
+      <section className="panel" hidden={currentView !== "resolution"}>
         <h3>Callback and review</h3>
         <p>
           Promise an update after review. Equipment remains blocked until
           required work and authorized release are recorded.
         </p>
         <div className="form-grid">
-          <label>
+          <label hidden={!canCustomer}>
             Agreed update time · ISO timestamp
             <input
               value={callbackAt}
@@ -1075,6 +1109,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           </label>
         </div>
         <button
+          hidden={!canCustomer}
           disabled={!isCS || !!matches.proposal || !equipmentId}
           onClick={() =>
             act({
@@ -1088,7 +1123,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         >
           Record callback
         </button>
-        <label>
+        <label hidden={!canResolve}>
           Review disposition
           <select
             value={reviewStatus}
@@ -1121,6 +1156,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             <p>{c.customer_update}</p>
             <div className="button-row">
               <button
+                hidden={!canResolve}
                 disabled={c.status !== "Open" || staff.role !== c.reviewer}
                 onClick={() =>
                   act({
@@ -1134,6 +1170,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 Record review result
               </button>
               <button
+                hidden={!canCustomer}
                 disabled={c.status !== "Open" || !isCS}
                 onClick={() =>
                   act({
@@ -1149,7 +1186,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           </div>
         ))}
       </section>
-      <details className="panel">
+      <details className="panel" hidden={currentView !== "resolution" && currentView !== "agreement"}>
         <summary>Decision history ({state.decisions.length})</summary>
         {state.decisions.length === 0 ? (
           <p>No decisions recorded.</p>
@@ -1188,7 +1225,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
           </div>
         )}
       </details>
-      <details className="panel">
+      <details className="panel" hidden={currentView !== "equipment" && currentView !== "agreement"}>
         <summary>All matching equipment and allocation history</summary>
         {matches.results.map((r) => (
           <p key={r.equipment_id}>
