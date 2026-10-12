@@ -99,9 +99,25 @@ try {
     assert.equal(await page.getByRole("dialog").count(), 0);
     assert.equal(await page.getByRole("combobox", { name: /Customer route/ }).inputValue(), route);
   }
-  await page.getByRole("combobox", { name: /^identity/ }).selectOption("Pending");
+  assert.equal(await page.getByRole("checkbox", { name: /verified$/ }).count(), 5);
+  assert.match(await main.innerText(), /Billing address:/);
+  assert.match(await main.innerText(), /Northstar Demo Insurance \(fictional\)/);
+  await page.getByRole("checkbox", { name: "Identity verified", exact: true }).click();
   await page.getByRole("dialog").waitFor();
   await page.keyboard.press("Escape");
+  assert.equal(await page.getByRole("checkbox", { name: "Identity verified", exact: true }).isChecked(), true);
+  await page.getByRole("checkbox", { name: "Identity verified", exact: true }).click();
+  await page.getByRole("dialog").getByLabel("Decision reason", { exact: true }).fill("Identity requires review");
+  await page.getByRole("dialog").getByLabel("Evidence reference", { exact: true }).fill("UI-PENDING-IDENTITY");
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
+  assert.equal(await page.getByRole("checkbox", { name: "Identity verified", exact: true }).isChecked(), false);
+  await nav("Agreement & confirmation");await record("Approve proposal");
+  assert.equal(await page.getByRole("button", { name: "Record customer acceptance", exact: true }).isDisabled(), true);
+  await nav("Customer & request");
+  await page.getByRole("checkbox", { name: "Identity verified", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
+  assert.equal(await page.getByRole("checkbox", { name: "Identity verified", exact: true }).isChecked(), true);
+  console.log("PASS checkbox cancellation, Pending/Verified updates and customer acceptance gate");
   await nav("Agreement & confirmation");assert.match(await panel.innerText(), /EQ-1001 · Temporary/);
   console.log("PASS availability-only exit, temporary protection before intake, existing/new customer branching");
   await fresh();

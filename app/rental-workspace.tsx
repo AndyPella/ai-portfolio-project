@@ -619,24 +619,27 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 "insurance_transport",
               ] as const
             ).map((key) => (
-              <label key={key}>
-                {key.replaceAll("_", " ")}
-                <select
+              <div className="verification-item" key={key}>
+                <label>
+                <input type="checkbox"
+                  aria-label={{ identity: "Identity verified", profile: "Customer profile verified", billing: "Billing verified", insurance_on_site: "On-site insurance verified", insurance_transport: "Transport insurance verified" }[key]}
                   disabled={!isCS}
-                  value={customer[key]}
+                  checked={customer[key] === "Verified"}
                   onChange={(e) =>
                     act({
                       type: "Update customer checks",
                       ...customer,
-                      [key]: e.target.value,
+                      [key]: e.target.checked ? "Verified" : "Pending",
                     } as WorkflowCommand)
                   }
-                >
-                  {["Verified", "Pending", "Failed"].map((x) => (
-                    <option key={x}>{x}</option>
-                  ))}
-                </select>
-              </label>
+                />{" "}
+                {{ identity: "Identity", profile: "Customer profile", billing: "Billing", insurance_on_site: "On-site insurance", insurance_transport: "Transport insurance" }[key]} · Verified
+                </label>
+                {key === "billing" && <p>Billing address: {request.intake.billing_address || "Not provided"}</p>}
+                {key === "insurance_on_site" && <p>Insurance company: {customer.insurance_on_site_company || "Not provided"}</p>}
+                {key === "insurance_transport" && <p>Insurance company: {customer.insurance_transport_company || "Not provided"}</p>}
+                {customer[key] !== "Verified" && <p className="scope-note">Current status: {customer[key]}. Rental acceptance requires verification.</p>}
+              </div>
             ))}
           </details>
         </section>
