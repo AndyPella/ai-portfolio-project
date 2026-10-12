@@ -46,7 +46,12 @@ try {
   await page.goto(base, { waitUntil: "networkidle" });
 
   const main = page.locator("#customer-service"), panel = main.locator(".decision-panel");
-  const nav = async name => page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name, exact: true }).click();
+  const nav = async name => {
+    const labels = { "Customer & request": "2 · Customer identification", "Equipment & readiness": "1 · Equipment availability", "Agreement & confirmation": "3 · Rental agreement" };
+    const button = page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name: labels[name] ?? name, exact: true });
+    if (await button.isDisabled()) await record("Proceed to rent · protect equipment");
+    await button.click();
+  };
   const role = async id => page.getByRole("combobox", { name: /Acting staff/ }).selectOption(id);
   const scenario = async id => page.getByRole("combobox", { name: /Demo request/ }).selectOption(id);
   const fresh = async () => page.reload({ waitUntil: "networkidle" });
@@ -61,6 +66,13 @@ try {
   };
   const lookup = main.locator("details").filter({ has: page.getByText("Change equipment · search or equipment list", { exact: true }) });
   assert.equal(await page.getByRole("button", { name: "Record passed demo safety checks", exact: true }).isVisible(), false);
+  assert.match(await main.locator(".section-guidance").innerText(), /Equipment availability/);
+  assert.equal(await page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name: "2 · Customer identification", exact: true }).isDisabled(), true);
+  await page.getByRole("button", { name: "Finish availability check", exact: true }).click();
+  assert.match(await page.getByRole("status").innerText(), /No equipment was allocated/);
+  assert.match(await main.locator(".rental-context").innerText(), /Availability inquiry/);
+  await record("Proceed to rent · protect equipment");
+  assert.match(await main.locator(".section-guidance").innerText(), /Customer identification/);
   await nav("Customer & request");
   await page.getByText("Edit shared intake and rental details", { exact: true }).click();
   await page.getByLabel(/Delivery \/ pickup notes/).fill("Retained unsaved delivery note");
@@ -68,13 +80,21 @@ try {
   await role("DEMO-MECH");
   assert.equal(await page.getByRole("button", { name: "Record passed demo safety checks", exact: true }).isVisible(), true);
   assert.equal(await page.getByRole("button", { name: "Reconcile conflicting records", exact: true }).isVisible(), false);
-  assert.equal(await page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name: "Customer & request", exact: true }).count(), 0);
+  assert.equal(await page.getByRole("navigation", { name: "Rental functions" }).getByRole("button", { name: "2 · Customer identification", exact: true }).count(), 0);
   await role("DEMO-MGR");
   assert.equal(await page.getByRole("button", { name: "Reconcile conflicting records", exact: true }).isVisible(), true);
   assert.equal(await page.getByRole("navigation", { name: "Rental functions" }).getByRole("button").count(), 4);
   await role("DEMO-CS");
+  await nav("Customer & request");
   assert.equal(await page.getByLabel(/Delivery \/ pickup notes/).inputValue(), "Retained unsaved delivery note");
   console.log("PASS role-specific visibility, manager sections and retained draft context");
+  await page.getByRole("combobox", { name: /Customer route/ }).selectOption("New");
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
+  assert.match(await main.innerText(), /Apply the existing new-customer workflow/);
+  await page.getByRole("combobox", { name: /Customer route/ }).selectOption("Existing");
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
+  await nav("Agreement & confirmation");assert.match(await panel.innerText(), /EQ-1001 · Temporary/);
+  console.log("PASS availability-only exit, temporary protection before intake, existing/new customer branching");
   await fresh();
   await nav("Equipment & readiness");
   await lookup.locator("summary").click();
@@ -105,12 +125,12 @@ try {
   }
   console.log("PASS examples load request and equipment without redundant selection");
   await fresh();
-  await nav("Agreement & confirmation");
-  await page.getByRole("button", { name: "Protect for four hours", exact: true }).click();
+  await page.getByRole("button", { name: "Proceed to rent · protect equipment", exact: true }).click();
   await page.getByRole("dialog").waitFor();
   assert.equal(await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).isDisabled(), true);
   await page.keyboard.press("Escape");
   assert.equal(await page.getByRole("dialog").count(), 0);
+  await nav("Agreement & confirmation");
   for (const name of ["Protect for four hours", "Approve proposal", "Record customer acceptance"]) await record(name);
   assert.match(await panel.innerText(), /EQ-1001 · Confirmed/);
   await page.getByRole("button", { name: "Advance four hours", exact: true }).click();

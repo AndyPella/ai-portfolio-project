@@ -58,7 +58,8 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
     "Incomplete" | "Confirmed plan" | "Denied" | "Complete"
   >("Incomplete");
   type View = "customer" | "equipment" | "agreement" | "resolution";
-  const [view, setView] = useState<View>("customer");
+  const [view, setView] = useState<View>("equipment");
+  const [startedRequests, setStartedRequests] = useState<string[]>([]);
   const [pending, setPending] = useState<Omit<WorkflowCommand, "actor" | "reason" | "evidence"> | null>(null);
   const [query, setQuery] = useState("");
   const [lookupId, setLookupId] = useState("");
@@ -140,6 +141,10 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         now,
       );
       setState(next);
+      if (command.type === "Allocate" && !startedRequests.includes(requestId)) {
+        setStartedRequests(ids => [...ids, requestId]);
+        setView("customer");
+      }
       setMessage(command.type + " recorded. Eligibility has been reevaluated.");
     } catch (error) {
       setMessage(
@@ -153,7 +158,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   useEffect(() => {
     const selectEntry = () => {
       if (window.location.hash === "#mechanic") { setActor("DEMO-MECH"); setView("resolution"); }
-      if (window.location.hash === "#customer-service") { setActor("DEMO-CS"); setView("customer"); }
+      if (window.location.hash === "#customer-service") { setActor("DEMO-CS"); setView("equipment"); }
     };
     selectEntry();
     window.addEventListener("hashchange", selectEntry);
@@ -184,6 +189,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   }, [now]);
   const choose = (id: string) => {
     setRequestId(id);
+    setView("equipment");
     const next = structuredClone(
       state.dataset.rental_workflow.rental_requests.find(
         (r) => r.request_id === id,
@@ -202,22 +208,24 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
     isManager = staff.role === "Manager";
   const canCustomer = isCS || isManager;
   const canResolve = isMech || isManager || staff.role === "Inspector";
-  const visibleViews: View[] = canCustomer ? ["customer", "equipment", "agreement", "resolution"] : ["equipment", "resolution"];
+  const rentalStarted = startedRequests.includes(requestId);
+  const visibleViews: View[] = canCustomer ? ["equipment", "customer", "agreement", "resolution"] : ["equipment", "resolution"];
   const currentView = visibleViews.includes(view) ? view : "equipment";
-  const titles: Record<View, string> = { customer: "Customer & request", equipment: "Equipment & readiness", agreement: "Agreement & confirmation", resolution: "Review & resolution" };
+  const titles: Record<View, string> = { customer: "2 · Customer identification", equipment: "1 · Equipment availability", agreement: "3 · Rental agreement", resolution: "Review & resolution" };
   const guidance: Record<View, string> = {
-    customer: "Review the customer, dates and expected use. Save changes before reviewing equipment.",
-    equipment: "Review the selected unit and readiness findings. Change equipment only when needed; selection does not establish readiness.",
+    customer: "Identify an existing customer or follow the assumed new-customer process. Complete customer details and required checks using the shared rental information.",
+    equipment: "Start with equipment needs, requested dates and expected use. Review availability, blockers and conditions. An availability-only inquiry does not require a customer profile or allocation.",
     agreement: "Review required checks and conditions, protect the equipment, approve the proposal, then record customer acceptance.",
     resolution: canResolve ? "Record qualified inspections or maintenance evidence and review holds. Work completion and hold release are separate actions." : "Arrange an owned callback when qualified review is needed. Maintenance findings remain visible in Equipment & readiness."
   };
   const nextStep = draft?.status === "Confirmed" ? "Rental confirmed. Review the recorded agreement and any continuing conditions."
     : result && !isReady(result) ? canResolve ? "Review the blocker and record the qualified resolution evidence." : "Review the blocker. Request qualified resolution or arrange a callback."
+    : !rentalStarted ? "Finish the availability inquiry here, or choose to rent and temporarily protect the equipment before customer identification."
     : checks.length ? "Complete the required customer checks before acceptance."
     : !assigned.length || assigned.some(a => a.scope !== requestScope(request)) ? "Protect the selected equipment for four hours."
     : !draft?.approved_scope ? "Review the proposal and record staff approval."
     : "Review customer acceptance, including all displayed conditions, before confirming.";
-  const openExample = (id: string) => { choose(id); setActor("DEMO-CS"); setView("customer"); setPending(null); };
+  const openExample = (id: string) => { choose(id); setActor("DEMO-CS"); setView("equipment"); setPending(null); };
   const changeIntake = (key: keyof RentalRequest["intake"], value: string) =>
     setEdit({ ...edit, intake: { ...edit.intake, [key]: value } });
   const confirmEquipment = (id: string, exact: boolean) => {
@@ -257,7 +265,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
       </p>
       <details className="panel walkthrough" id="guided-walkthrough">
         <summary>Explore a sample rental</summary>
-        <p>Load a sample request and its proposed equipment, then use the workspace sections below. Switching examples retains session changes; reload restores the original data.</p>
+        <p>Load a sample request and its proposed equipment, then use the workspace sections below. Begin with availability. Proceed to rent only when the customer wants a rental, then identify an existing or new customer. Switching examples retains session changes; reload restores the original data.</p>
         <div className="button-row">
           <button className="secondary" onClick={() => openExample("REQ-SCN-001")}>1 · Ready to rent</button>
           <button className="secondary" onClick={() => openExample("REQ-SCN-002")}>2 · Blocked rental</button>
@@ -281,7 +289,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         </label>
         <label>
           Acting staff
-          <select value={actor} onChange={(e) => { setActor(e.target.value); setPending(null); setView(e.target.value === "DEMO-CS" ? "customer" : "resolution"); }}>
+          <select value={actor} onChange={(e) => { setActor(e.target.value); setPending(null); setView(e.target.value === "DEMO-CS" ? "equipment" : "resolution"); }}>
             {state.dataset.rental_workflow.staff.map((s) => (
               <option key={s.staff_id} value={s.staff_id}>
                 {s.name} · {s.role}
@@ -310,22 +318,75 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         {message}
       </div>
       <div className="rental-context" aria-label="Current rental summary">
-        <div><small>Customer</small><strong>{request.intake.renter_name}</strong></div>
+        <div><small>Customer</small><strong>{rentalStarted || isManager ? request.intake.renter_name : "Availability inquiry · not required yet"}</strong></div>
         <div><small>Rental dates · Pacific</small><strong>{stamp(request.pickup)} → {stamp(request.return_at)}</strong></div>
         <div><small>Selected equipment</small><strong>{equipmentId ?? "No unit selected"} · {request.equipment_type}</strong></div>
         <div><small>Current status</small><strong>{draft?.status === "Confirmed" ? "Confirmed" : result?.outcome ?? "Needs review"}</strong></div>
       </div>
       <nav className="workspace-navigation" aria-label="Rental functions">
-        {visibleViews.map(id => <button key={id} className={currentView === id ? "" : "secondary"} aria-current={currentView === id ? "page" : undefined} onClick={() => setView(id)}>{titles[id]}</button>)}
+        {visibleViews.map(id => <button key={id} disabled={!rentalStarted && !isManager && (id === "customer" || id === "agreement")} className={currentView === id ? "" : "secondary"} aria-current={currentView === id ? "page" : undefined} onClick={() => setView(id)}>{titles[id]}</button>)}
       </nav>
       <div className="section-guidance">
         <h3>{titles[currentView]}</h3><p>{guidance[currentView]}</p>
         <p><strong>Next action:</strong> {nextStep}</p>
-        {currentView === "customer" && <button onClick={() => setView("equipment")}>Review equipment readiness</button>}
-        {currentView === "equipment" && canCustomer && result && isReady(result) && <button onClick={() => setView("agreement")}>Prepare rental agreement</button>}
+        {currentView === "customer" && <button onClick={() => setView("agreement")}>Continue to rental agreement</button>}
+        {currentView === "equipment" && canCustomer && !rentalStarted && <>
+          <div className="button-row">
+            <button disabled={!isCS || !matches.proposal} onClick={() => act({ type: "Allocate", request_id: requestId } as WorkflowCommand)}>Proceed to rent · protect equipment</button>
+            <button className="secondary" onClick={() => setMessage("Availability inquiry complete. No equipment was allocated and no customer profile was required.")}>Finish availability check</button>
+          </div>
+          <p className="scope-note">Proceeding protects the equipment for up to four hours while existing/new customer identification is completed. Expiry releases temporary protection; early release is outside the lightweight demo scope.</p>
+        </>}
+        {currentView === "equipment" && canCustomer && rentalStarted && result && isReady(result) && <button onClick={() => setView("agreement")}>Prepare rental agreement</button>}
         {currentView === "equipment" && result && !isReady(result) && <button onClick={() => setView("resolution")}>Review resolution options</button>}
         {currentView === "resolution" && <button className="secondary" onClick={() => setView("equipment")}>Return to readiness</button>}
       </div>
+      <section className="panel" hidden={currentView !== "equipment" || !canCustomer}>
+        <h3>Equipment needs and rental period</h3>
+        <p>{request.equipment_type} · {request.location}. Use the equipment list or search below to change the requested equipment. Dates and usage determine the readiness result.</p>
+        <div className="form-grid">
+              <label>
+                Pickup · ISO timestamp
+                <input
+                  value={edit.pickup}
+                  onChange={(e) => setEdit({ ...edit, pickup: e.target.value })}
+                />
+              </label>
+              <label>
+                Return · ISO timestamp
+                <input
+                  value={edit.return_at}
+                  onChange={(e) =>
+                    setEdit({ ...edit, return_at: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Daily operating hours
+                <input
+                  type="number"
+                  min="0"
+                  max="24"
+                  value={edit.daily_hours}
+                  onChange={(e) =>
+                    setEdit({ ...edit, daily_hours: Number(e.target.value) })
+                  }
+                />
+              </label>
+              <label>
+                Total operating hours
+                <input
+                  type="number"
+                  min="0"
+                  value={edit.total_hours}
+                  onChange={(e) =>
+                    setEdit({ ...edit, total_hours: Number(e.target.value) })
+                  }
+                />
+              </label>
+        </div>
+        <button disabled={!isCS || draft?.status === "Confirmed"} onClick={() => act({ type: "Update request", request: { ...request, pickup: edit.pickup, return_at: edit.return_at, daily_hours: edit.daily_hours, total_hours: edit.total_hours } } as WorkflowCommand)}>Check requested availability</button>
+      </section>
       <details className="panel" hidden={currentView !== "equipment" || !canCustomer}>
         <summary>Change equipment · search or equipment list</summary>
         <label>
@@ -395,6 +456,25 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
             <br />
             {request.intake.primary_contact} · {request.intake.contact}
           </p>
+            <label>
+              Customer route
+              <select
+                value={customer.route}
+                disabled={!isCS}
+                onChange={(e) =>
+                  act({
+                    type: "Update customer checks",
+                    ...customer,
+                    route: e.target.value as typeof customer.route,
+                  } as WorkflowCommand)
+                }
+              >
+                {["Existing", "New", "Uncertain"].map((x) => (
+                  <option key={x}>{x}</option>
+                ))}
+              </select>
+            </label>
+          <p className="scope-note">Existing uses the sample customer match. New represents the assumed working registration process; this demo records its checks rather than building a customer registration system.</p>
           <p>
             Customer routing: <strong>{customer.route}</strong>.{" "}
             {customer.route === "New"
@@ -428,45 +508,6 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                   />
                 </label>
               ))}
-              <label>
-                Pickup · ISO timestamp
-                <input
-                  value={edit.pickup}
-                  onChange={(e) => setEdit({ ...edit, pickup: e.target.value })}
-                />
-              </label>
-              <label>
-                Return · ISO timestamp
-                <input
-                  value={edit.return_at}
-                  onChange={(e) =>
-                    setEdit({ ...edit, return_at: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Daily operating hours
-                <input
-                  type="number"
-                  min="0"
-                  max="24"
-                  value={edit.daily_hours}
-                  onChange={(e) =>
-                    setEdit({ ...edit, daily_hours: Number(e.target.value) })
-                  }
-                />
-              </label>
-              <label>
-                Total operating hours
-                <input
-                  type="number"
-                  min="0"
-                  value={edit.total_hours}
-                  onChange={(e) =>
-                    setEdit({ ...edit, total_hours: Number(e.target.value) })
-                  }
-                />
-              </label>
               <label>
                 Preparation hours
                 <input
@@ -557,31 +598,13 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
               Save and reevaluate
             </button>
           </details>
-          <details>
+          <details open>
             <summary>Billing, insurance and customer checks</summary>
             <p>
               Required checks gate acceptance. Sample verification represents
               the existing process; it does not build registration or insurance
               policy.
             </p>
-            <label>
-              Customer route
-              <select
-                value={customer.route}
-                disabled={!isCS}
-                onChange={(e) =>
-                  act({
-                    type: "Update customer checks",
-                    ...customer,
-                    route: e.target.value as typeof customer.route,
-                  } as WorkflowCommand)
-                }
-              >
-                {["Existing", "New", "Uncertain"].map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>
-            </label>
             {(
               [
                 "identity",
@@ -648,8 +671,8 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                     ? "In-time · up to five days before pickup"
                     : "Advance request"}
                 </dd>
-                <dt hidden={!canCustomer}>Customer verification</dt>
-                <dd hidden={!canCustomer}>
+                <dt hidden={!canCustomer || !rentalStarted}>Customer verification</dt>
+                <dd hidden={!canCustomer || !rentalStarted}>
                   {checks.length
                     ? checks.join("; ")
                     : "Required checks verified"}
