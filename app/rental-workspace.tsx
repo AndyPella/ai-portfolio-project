@@ -60,6 +60,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   type View = "customer" | "equipment" | "agreement" | "resolution";
   const [view, setView] = useState<View>("equipment");
   const [startedRequests, setStartedRequests] = useState<string[]>([]);
+  const [findingsOpen, setFindingsOpen] = useState(false);
   const [pending, setPending] = useState<Omit<WorkflowCommand, "actor" | "reason" | "evidence"> | null>(null);
   const [query, setQuery] = useState("");
   const [lookupId, setLookupId] = useState("");
@@ -195,6 +196,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   const choose = (id: string) => {
     setRequestId(id);
     setView("equipment");
+    setFindingsOpen(false);
     const next = structuredClone(
       state.dataset.rental_workflow.rental_requests.find(
         (r) => r.request_id === id,
@@ -214,6 +216,19 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   const canCustomer = isCS || isManager;
   const canResolve = isMech || isManager || staff.role === "Inspector";
   const rentalStarted = startedRequests.includes(requestId);
+  const blockingReasons = result && !isReady(result)
+    ? [...new Set(result.findings.filter(f => f.outcome !== "Rental Ready" && f.outcome !== "Rental Ready with Conditions").map(f => readableTimes(f.message)))]
+    : [];
+  const reviewBlockers = () => {
+    setView("equipment");
+    setFindingsOpen(true);
+    requestAnimationFrame(() => {
+      const findings = document.getElementById("readiness-findings");
+      if (!findings) return;
+      const headerHeight = window.innerWidth > 760 ? document.querySelector(".rental-context")?.getBoundingClientRect().height ?? 0 : 0;
+      window.scrollTo({ top: findings.getBoundingClientRect().top + window.scrollY - headerHeight - 20, behavior: "smooth" });
+    });
+  };
   const visibleViews: View[] = canCustomer ? ["equipment", "customer", "agreement", "resolution"] : ["equipment", "resolution"];
   const currentView = visibleViews.includes(view) ? view : "equipment";
   const titles: Record<View, string> = { customer: "2 · Customer identification", equipment: "1 · Equipment availability", agreement: "3 · Rental agreement", resolution: "Review & resolution" };
@@ -326,7 +341,9 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         <div><small>Customer</small><strong>{rentalStarted || isManager ? request.intake.renter_name : "Availability inquiry · not required yet"}</strong></div>
         <div><small>Rental dates · Pacific</small><strong>{stamp(request.pickup)} → {stamp(request.return_at)}</strong></div>
         <div><small>Selected equipment</small><strong>{equipmentId ?? "No unit selected"} · {request.equipment_type}</strong></div>
-        <div><small>Current status</small><strong>{draft?.status === "Confirmed" ? "Confirmed" : result?.outcome ?? "Needs review"}</strong></div>
+        <div><small>Current status</small><strong>{draft?.status === "Confirmed" ? "Confirmed" : result?.outcome ?? "Needs review"}</strong>
+          {blockingReasons.length > 0 && <div className="status-blockers"><small>Rental blocked · reason</small><ul>{blockingReasons.map(reason => <li key={reason}>{reason}</li>)}</ul><button className="secondary" onClick={reviewBlockers}>Review blocker details</button></div>}
+        </div>
       </div>
       <nav className="workspace-navigation" aria-label="Rental functions">
         {visibleViews.map(id => <button key={id} disabled={!rentalStarted && !isManager && (id === "customer" || id === "agreement")} className={currentView === id ? "" : "secondary"} aria-current={currentView === id ? "page" : undefined} onClick={() => setView(id)}>{titles[id]}</button>)}
@@ -798,7 +815,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 conditions. Confirmation rechecks current eligibility, staff
                 approval and allocation expiry.
               </p>
-              <details>
+              <details id="readiness-findings" open={findingsOpen} onToggle={e => setFindingsOpen(e.currentTarget.open)}>
                 <summary>
                   Rule evidence and required human actions (
                   {result.findings.length})

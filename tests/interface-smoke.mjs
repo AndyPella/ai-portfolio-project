@@ -173,6 +173,13 @@ try {
   assert.match(await panel.innerText(), /Not Available/);
   console.log("PASS service disclosure, acceptance and decline branches");
   await fresh();await scenario("REQ-SCN-002");await nav("Equipment & readiness");assert.match(await panel.innerText(), /Remediation Required/);
+  const blockedSummary = main.locator(".rental-context");
+  assert.match(await blockedSummary.innerText(), /Rental blocked · reason/);
+  assert.match(await blockedSummary.innerText(), /inspection|hold/i);
+  await blockedSummary.getByRole("button", { name: "Review blocker details", exact: true }).click();
+  assert.equal(await page.locator("#readiness-findings").getAttribute("open"), "");
+  assert.match(await page.locator("#readiness-findings").innerText(), /inspection|hold/i);
+  console.log("PASS blocker reasons in current status and direct review path");
   await role("DEMO-MECH");await record("Record passed demo safety checks");
   await nav("Equipment & readiness");assert.match(await panel.innerText(), /Remediation Required/);
   await nav("Review & resolution");await record("Release selected hold");

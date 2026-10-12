@@ -99,3 +99,6 @@ footer p { margin: 0; }
 .verification-item { padding: 14px 0; border-bottom: 1px solid var(--line); }
 .verification-item label { color: var(--ink); font-weight: 700; }
 .verification-item p { margin: 5px 0 8px 26px; font-size: 14px; }
+.status-blockers { margin-top: 10px; font-size: 13px; line-height: 1.5; }
+.status-blockers ul { padding-left: 18px; margin: 5px 0 10px; }
+.status-blockers li { margin: 5px 0; }
