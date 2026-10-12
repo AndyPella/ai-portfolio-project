@@ -94,13 +94,14 @@ try {
   await nav("Customer & request");
   assert.equal(await page.getByLabel(/Delivery \/ pickup notes/).inputValue(), "Retained unsaved delivery note");
   console.log("PASS role-specific visibility, manager sections and retained draft context");
-  await page.getByRole("combobox", { name: /Customer route/ }).selectOption("New");
-  await page.getByRole("dialog").getByLabel("Decision reason", { exact: true }).fill("Sample new customer process completed");
-  await page.getByRole("dialog").getByLabel("Evidence reference", { exact: true }).fill("UI-NEW-CUSTOMER-CHECKS");
-  await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
-  assert.match(await main.innerText(), /Apply the existing new-customer workflow/);
-  await page.getByRole("combobox", { name: /Customer route/ }).selectOption("Existing");
-  await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
+  for (const route of ["New", "Uncertain", "Existing"]) {
+    await page.getByRole("combobox", { name: /Customer route/ }).selectOption(route);
+    assert.equal(await page.getByRole("dialog").count(), 0);
+    assert.equal(await page.getByRole("combobox", { name: /Customer route/ }).inputValue(), route);
+  }
+  await page.getByRole("combobox", { name: /^identity/ }).selectOption("Pending");
+  await page.getByRole("dialog").waitFor();
+  await page.keyboard.press("Escape");
   await nav("Agreement & confirmation");assert.match(await panel.innerText(), /EQ-1001 · Temporary/);
   console.log("PASS availability-only exit, temporary protection before intake, existing/new customer branching");
   await fresh();

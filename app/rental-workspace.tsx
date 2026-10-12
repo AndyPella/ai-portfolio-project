@@ -467,11 +467,11 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 value={customer.route}
                 disabled={!isCS}
                 onChange={(e) =>
-                  act({
+                  advanceRoutine({
                     type: "Update customer checks",
                     ...customer,
                     route: e.target.value as typeof customer.route,
-                  } as WorkflowCommand)
+                  } as WorkflowCommand, "Select customer type")
                 }
               >
                 {["Existing", "New", "Uncertain"].map((x) => (
