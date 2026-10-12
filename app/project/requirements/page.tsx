@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 export const metadata: Metadata = { title: "From requirements to product | Northstar Ridge" };
 export default function RequirementsPage() { return (<article><p className="section-kicker">Case study</p><h1>From requirements to product</h1>
 <h2>Project overview</h2>
@@ -39,4 +40,5 @@ export default function RequirementsPage() { return (<article><p className="sect
 <p>Validation covered ready rentals, inspection and hold resolution, service conditions, customer checks, callbacks, temporary allocation expiry, and equipment-selection consistency. Automated domain tests and browser checks supported scenario review.</p>
 <p>The implemented scope uses fictional data, sample staff roles, and deterministic responses. Live AI, production authentication, customer-system integration, and early release of temporary allocations remain future work.</p>
 <p>Known defects are documented separately as an operational extension. Passing tests supports the behaviors checked; it does not establish that the product is defect-free.</p>
+<p><Link href="/project/operations">Continue to operational follow-through: visible bug tracking</Link></p>
 </article>); }
