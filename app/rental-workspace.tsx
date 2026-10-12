@@ -133,11 +133,12 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
   const callbacks = state.callbacks.filter((c) => c.request_id === requestId);
   const perform = (
     command: Omit<WorkflowCommand, "actor" | "reason" | "evidence">,
+    routineRecord?: { reason: string; evidence: string },
   ) => {
     try {
       const next = applyWorkflow(
         state,
-        { ...command, actor, reason, evidence } as WorkflowCommand,
+        { ...command, actor, reason, evidence, ...routineRecord } as WorkflowCommand,
         now,
       );
       setState(next);
@@ -155,6 +156,10 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
     }
   };
   const act = (command: Omit<WorkflowCommand, "actor" | "reason" | "evidence">) => setPending(command);
+  const advanceRoutine = (command: Omit<WorkflowCommand, "actor" | "reason" | "evidence">, action: string) => perform(command, {
+    reason: `Routine UI action: ${action}. No staff verification was requested.`,
+    evidence: `UI request ${requestId} at ${now}; recorded interaction, not inspection or approval evidence.`,
+  });
   useEffect(() => {
     const selectEntry = () => {
       if (window.location.hash === "#mechanic") { setActor("DEMO-MECH"); setView("resolution"); }
@@ -332,7 +337,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
         {currentView === "customer" && <button onClick={() => setView("agreement")}>Continue to rental agreement</button>}
         {currentView === "equipment" && canCustomer && !rentalStarted && <>
           <div className="button-row">
-            <button disabled={!isCS || !matches.proposal} onClick={() => act({ type: "Allocate", request_id: requestId } as WorkflowCommand)}>Proceed to rent · protect equipment</button>
+            <button disabled={!isCS || !matches.proposal} onClick={() => advanceRoutine({ type: "Allocate", request_id: requestId } as WorkflowCommand, "Proceed to rent")}>Proceed to rent · protect equipment</button>
             <button className="secondary" onClick={() => setMessage("Availability inquiry complete. No equipment was allocated and no customer profile was required.")}>Finish availability check</button>
           </div>
           <p className="scope-note">Proceeding protects the equipment for up to four hours while existing/new customer identification is completed. Expiry releases temporary protection; early release is outside the lightweight demo scope.</p>
@@ -385,7 +390,7 @@ export default function RentalWorkspace({ source }: { source: RentalDataset }) {
                 />
               </label>
         </div>
-        <button disabled={!isCS || draft?.status === "Confirmed"} onClick={() => act({ type: "Update request", request: { ...request, pickup: edit.pickup, return_at: edit.return_at, daily_hours: edit.daily_hours, total_hours: edit.total_hours } } as WorkflowCommand)}>Check requested availability</button>
+        <button disabled={!isCS || draft?.status === "Confirmed"} onClick={() => advanceRoutine({ type: "Update request", request: { ...request, pickup: edit.pickup, return_at: edit.return_at, daily_hours: edit.daily_hours, total_hours: edit.total_hours } } as WorkflowCommand, "Check requested availability")}>Check requested availability</button>
       </section>
       <details className="panel" hidden={currentView !== "equipment" || !canCustomer}>
         <summary>Change equipment · search or equipment list</summary>

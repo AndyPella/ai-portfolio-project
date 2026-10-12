@@ -57,6 +57,10 @@ try {
   const fresh = async () => page.reload({ waitUntil: "networkidle" });
   const record = async name => {
     await page.getByRole("button", { name, exact: true }).click();
+    if (name === "Proceed to rent · protect equipment") {
+      assert.equal(await page.getByRole("dialog").count(), 0);
+      return;
+    }
     const dialog = page.getByRole("dialog");
     await dialog.waitFor();
     await dialog.getByLabel("Decision reason", { exact: true }).fill("Reviewed fictional scenario and required evidence");
@@ -71,6 +75,8 @@ try {
   await page.getByRole("button", { name: "Finish availability check", exact: true }).click();
   assert.match(await page.getByRole("status").innerText(), /No equipment was allocated/);
   assert.match(await main.locator(".rental-context").innerText(), /Availability inquiry/);
+  await page.getByRole("button", { name: "Check requested availability", exact: true }).click();
+  assert.equal(await page.getByRole("dialog").count(), 0);
   await record("Proceed to rent · protect equipment");
   assert.match(await main.locator(".section-guidance").innerText(), /Customer identification/);
   await nav("Customer & request");
@@ -89,6 +95,8 @@ try {
   assert.equal(await page.getByLabel(/Delivery \/ pickup notes/).inputValue(), "Retained unsaved delivery note");
   console.log("PASS role-specific visibility, manager sections and retained draft context");
   await page.getByRole("combobox", { name: /Customer route/ }).selectOption("New");
+  await page.getByRole("dialog").getByLabel("Decision reason", { exact: true }).fill("Sample new customer process completed");
+  await page.getByRole("dialog").getByLabel("Evidence reference", { exact: true }).fill("UI-NEW-CUSTOMER-CHECKS");
   await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).click();
   assert.match(await main.innerText(), /Apply the existing new-customer workflow/);
   await page.getByRole("combobox", { name: /Customer route/ }).selectOption("Existing");
@@ -125,7 +133,9 @@ try {
   }
   console.log("PASS examples load request and equipment without redundant selection");
   await fresh();
-  await page.getByRole("button", { name: "Proceed to rent · protect equipment", exact: true }).click();
+  await record("Proceed to rent · protect equipment");
+  await nav("Agreement & confirmation");
+  await page.getByRole("button", { name: "Approve proposal", exact: true }).click();
   await page.getByRole("dialog").waitFor();
   assert.equal(await page.getByRole("dialog").getByRole("button", { name: "Confirm action", exact: true }).isDisabled(), true);
   await page.keyboard.press("Escape");
