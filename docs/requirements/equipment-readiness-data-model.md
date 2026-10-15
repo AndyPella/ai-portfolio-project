@@ -3,16 +3,17 @@
 - **Status:** Working model
 - **Data classification:** Fictional and public-safe
 - **Working dataset:** Northstar Ridge Equipment Readiness Demo Data
-- **Dataset location:** Private project Google Drive
+- **Authoritative dataset:** `data/northstar-ridge-demo-data.json` in the repository
 
 ## Purpose
 
 This document describes the conceptual data model used to test the Northstar Ridge
 Equipment Group operational-readiness demonstration.
 
-The Google Sheet is the working seed dataset. This document preserves the record
-purposes, relationships, identifiers, and scenario coverage within the repository
-without publishing the private Drive link.
+The repository JSON file is the authoritative working seed dataset. This document
+preserves its record purposes, relationships, identifiers, and scenario coverage.
+Changes follow pull-request review and validation as documented in
+[the demo data workflow](../data-snapshot-workflow.md).
 
 The records simulate information retrieved from already-connected company sources.
 They are not production integrations or copies of real company data.

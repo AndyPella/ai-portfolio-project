@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { evaluateEquipmentReadiness } from "../domain/equipment-readiness.ts";
@@ -184,6 +183,9 @@ test("an explicit, valid as-of date is required", () => {
   assert.throws(() => evaluate("EQ-1001", "2026-02-30"), /asOfDate/);
 });
 
-test("the original JSON snapshot remains byte-for-byte unchanged", () => {
-  assert.equal(createHash("sha256").update(snapshotText).digest("hex"), "1b3de2c2585d3381f447bf5f2efe28804843f6dfb32c1e05f8dd416e56f01235");
+test("read-only evaluations do not mutate the reviewed source snapshot", () => {
+  const data=copy(), before=JSON.stringify(data);
+  for(const e of data.equipment) evaluate(e.equipment_id,"2026-09-10",data);
+  assert.equal(JSON.stringify(data),before);
 });
+

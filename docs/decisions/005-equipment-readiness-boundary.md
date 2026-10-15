@@ -59,7 +59,7 @@ The focused availability evaluation may consider:
 
 ## Scope Treatment
 
-The fully demonstrated business workflow still produces **Equipment Ready**.
+The operational workflow produces **Equipment Ready** independently of the rental request. PR 17 adds the approved rental evaluation and Customer Service simulation described in [the current requirements](../requirements/rental-readiness-service-delay-policy.md).
 
 A small, read-only availability evaluation may consume that status to demonstrate the
 framework's downstream hook. It may return:
@@ -70,8 +70,7 @@ framework's downstream hook. It may return:
 - Remediation Required
 - Human Review Required
 
-The prototype will not create, modify, confirm, cancel, or fulfill reservations. It
-will not allocate equipment or execute a rental transaction.
+Production reservations remain read-only. The demo now supports in-memory four-hour temporary allocations, confirmed conversion, pre-acceptance cancellation, expiry, and two-unit replacement protection. These states do not execute a production rental, dispatch, CRM write, or booking. Customer verification is a separate confirmation gate; display-only customer context does not silently change equipment readiness.
 
 ## On-Site Work Classification
 
@@ -111,3 +110,4 @@ This decision:
   without building a rental-management system.
 - Creates clear normal, conditional, conflict, contradiction, and human-review tests.
 - Prevents downstream availability logic from silently expanding the primary workflow.
+

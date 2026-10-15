@@ -3,7 +3,8 @@
 - **Status:** Accepted working workflow
 - **Role:** Customer service and front-counter staff
 - **Primary outcome:** An equipment selection summary for handoff to the existing rental process
-- **Scope boundary:** The workflow does not create, allocate, confirm, or fulfill a reservation
+- **Scope boundary:** Production reservations are read-only; temporary/confirmed allocation and acceptance states are an in-memory demo.
+- **Current contract:** [PR 17 requirements](../requirements/rental-readiness-service-delay-policy.md) and [implementation checkpoint](../checkpoints/2026-10-10-rental-workflow-implementation.md) supersede earlier timing/allocation wording.
 
 ## Objective
 
@@ -80,7 +81,7 @@ When several units match, rank from least to greatest operational interruption:
 Within the same interruption level, prefer the requested/current location, stronger
 readiness, shorter interruption, and then shorter nearby-branch distance.
 
-The system presents ranked options but does not allocate equipment automatically.
+The system automatically proposes the best qualifying ready option, followed by a qualifying conditional option. Pending work remains provisional and cannot be allocated. Qualifying selection can create a four-hour temporary allocation; Customer Service approval and customer acceptance gate confirmed conversion.
 
 ### Evaluation Window
 
@@ -106,16 +107,9 @@ start, and overlap with the requested rental period.
 Completed or well-confirmed work ranks above incomplete, uncertain, or overlapping
 work.
 
-### Twenty-Four-Hour Completion Buffer
+### Preparation and Return Buffers
 
-Required inspection or maintenance must finish at least 24 hours before the rental
-starts to avoid a start-time risk.
-
-Work finishing less than 24 hours before rental ranks lower and is identified as a
-risk. Unconfirmed work produces a conditional or remediation outcome. Full-outage work
-during the rental makes the unit unavailable.
-
-The 24-hour buffer is fixed for the demo and configurable in a future implementation.
+Required work, checks and release must finish before preparation starts. Default protection begins two hours before pickup and ends two hours after return. Recorded longer work/transport extends the buffer. Exact adjacency is permitted. A confirmed work plan supports a separate forecast only; verification and authorized release remain required. Full-outage work during rental makes the option unavailable.
 
 ### Illustrative Selection Summary
 
@@ -153,8 +147,7 @@ If the customer declines planned work or interruption, return to the ranked resu
 while preserving equipment type, dates, location, capabilities, and other search
 context.
 
-Show alternatives without the declined condition. Do not automatically select a
-replacement.
+Exclude the declined option for the unchanged request and evaluate qualifying alternatives. A replacement proposal remains subject to human approval and acceptance.
 
 If no compliant alternative exists, terminate the selection with **No suitable
 equipment available for the requested period**. Required inspection or maintenance
@@ -165,7 +158,7 @@ cannot be waived, postponed, or bypassed.
 When the original period cannot be satisfied, offer valid alternative date ranges.
 
 The earliest possible alternative begins after required work completion plus the
-24-hour buffer. Each alternative preserves the requested rental duration and is
+preparation buffer. Each alternative preserves the requested rental duration and is
 reevaluated for readiness, reservations, inspection, maintenance, and the three-day
 pre-rental window.
 
@@ -208,14 +201,9 @@ Confirmed capabilities remain in the search context and apply to local, nearby-b
 and alternative-date results. The system does not recommend equipment outside its
 recorded capabilities.
 
-### Display-Only Mock Customer Context
+### Explicit Sample Customer Checks
 
-Customer context is not required for the equipment search. The final illustrative
-summary may show clearly labeled mock customer information to demonstrate a future
-integration point.
-
-Mock customer or site information is display-only. It does not affect matching,
-readiness, availability, ranking, maintenance, inspection, or alternatives.
+Identity matching and Existing/New/Uncertain routing are required checks. Sample profile, billing, on-site insurance and transport insurance verification gate final confirmation. Shared intake supplies both profile preparation and agreement/handoff details, including delivery/pickup notes. The existing new-customer process is assumed working; this demo does not build registration. Equipment eligibility remains independent of customer verification. Customer operational service permission/access windows are explicit service-plan inputs; site-document verification is a separate acceptance gate.
 
 ## Normal Flow
 
@@ -227,7 +215,7 @@ readiness, availability, ranking, maintenance, inspection, or alternatives.
 6. The system evaluates readiness and availability for the three-day pre-rental window
    through the rental end.
 7. Matching units are ranked from least to greatest interruption.
-8. The employee selects a specific Equipment ID.
+8. The system proposes a qualifying unit and temporarily protects it; the employee approves it.
 9. Conditional work requires recorded customer acknowledgement.
 10. The system displays an illustrative reservation and handoff summary.
 
@@ -244,11 +232,18 @@ readiness, availability, ranking, maintenance, inspection, or alternatives.
 ## Explicit Exclusions
 
 - New inventory intake
-- Equipment allocation
-- Reservation creation or confirmation
+- Production equipment allocation
+- Production reservation creation or confirmation
 - Rental pickup, return, or fulfillment
 - Equipment transfer execution
 - CRM retrieval or updates
-- Customer identity or consent workflow
+- Production customer identity verification, signatures or consent execution
 - Waiving required inspection or maintenance
 - Customer-service condition-reporting workflow
+
+
+## Implemented versus planned
+
+PR 17 implements scenario selection, exact Equipment ID/serial and constrained term lookup, request edits, full-period eligibility, ready-first proposals, shared intake/customer gates, service plans, role-controlled resolution, callbacks, allocations and decision history. The runtime summary is a clearly labeled grounded template.
+
+Broader conversational AI interpretation, distance-based nearby-branch ranking, automatic 30-day alternative-date enumeration, production reservation lifecycle and detailed dispatch remain planned; the 30-day search concept is not an advance-booking limit. An explicitly revised branch/date request is reevaluated. The earlier interruption ranking is a product direction: verified ready and conditional options qualify; confirmed/unconfirmed pending work is forecast-only and never ranks as eligible.

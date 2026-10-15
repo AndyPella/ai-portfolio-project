@@ -108,6 +108,12 @@ function validateRecord(type: string, value: unknown, schema: Schema, fallbackId
     else if (kind === "timestamp" && (typeof fieldValue !== "string" || !timestampPattern.test(fieldValue))) fail(type, id, field, "must be an ISO 8601 timestamp with an explicit timezone");
     else if (kind !== "date" && kind !== "timestamp" && typeof fieldValue !== kind) fail(type, id, field, `must be a ${kind}`);
     if (kind === "string" && fieldValue === "") fail(type, id, field, "must not be an empty string");
+    if (kind === "number" && !Number.isFinite(fieldValue)) fail(type, id, field, "must be finite");
+    if (kind === "number" && Number(fieldValue)<0) fail(type,id,field,"must be nonnegative");
+    if ((kind==="date"||kind==="timestamp")&&typeof fieldValue==="string") {
+      const day=fieldValue.slice(0,10),parsed=new Date(day+"T00:00:00Z");
+      if(!Number.isFinite(parsed.valueOf())||parsed.toISOString().slice(0,10)!==day)fail(type,id,field,"must be a valid calendar date");
+    }
   }
   return record;
 }
@@ -140,3 +146,4 @@ export function validateNorthstarRidgeDataset(value: unknown): NorthstarRidgeDat
   }
   return value as NorthstarRidgeDataset;
 }
+
