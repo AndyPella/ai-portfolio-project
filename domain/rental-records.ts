@@ -56,6 +56,8 @@ export interface CustomerCheck {
   billing: "Verified" | "Pending" | "Failed";
   insurance_on_site: "Verified" | "Pending" | "Failed";
   insurance_transport: "Verified" | "Pending" | "Failed";
+  insurance_on_site_company?: string;
+  insurance_transport_company?: string;
   evidence: string;
 }
 export interface UsageWindow {
