@@ -35,7 +35,7 @@ independently waive a business control.
 Authorized staff remain responsible for decisions such as:
 
 - Confirming an uncertain identifier or equipment-term match.
-- Selecting equipment from ranked alternatives.
+- Approving automatically proposed qualifying equipment, or confirming clarified requirements.
 - Recording customer acceptance of planned work.
 - Placing an asset on Mechanic Hold.
 - Selecting the reason for a hold.
@@ -56,8 +56,8 @@ Deterministic code and authoritative records control:
 - Open defects and corrective-work status.
 - Equipment Readiness Outcome.
 - The three-day pre-rental evaluation window.
-- The 24-hour completion buffer.
-- Reservation and schedule conflicts used by the read-only availability proof.
+- Two-hour preparation and return defaults, extended by recorded longer work/transport.
+- Production reservation/schedule conflict evaluation and simulated allocation protection/expiry.
 - Interruption-based ranking.
 - Mechanic Hold and release-state transitions.
 - Permission enforcement.
@@ -91,3 +91,10 @@ The build should preserve:
 - Git commits and pull-request history.
 - Traceable examples showing AI interpretation followed by deterministic decisions and
   human gates.
+
+
+## Implemented demonstration boundary — 2026-10-10
+
+The runtime presents brief, deterministic summaries grounded in structured findings; it makes no live AI calls. Exact identifier normalization and constrained equipment-term lookup are implemented, with clarification for ambiguous results. Live model interpretation and generated explanations remain an integration follow-up. These templates are visibly labeled and cannot certify work or waive a rule.
+
+Sample role/qualification checks gate technical completion, inspections, routine release, Manager reconciliation/delay approval, and Customer Service acceptance. Each decision records actor, time, request/equipment/task/hold reference, reason, evidence and applicable request scope. Changed inputs or plans invalidate approval and conditional acceptance; final confirmation reevaluates eligibility. Production authentication is outside this simulation.
