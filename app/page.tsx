@@ -1,7 +1,5 @@
 import snapshot from "../data/northstar-ridge-demo-data.json";
 import { validateNorthstarRidgeDataset } from "../data/northstar-ridge-data";
-import RentalWorkspace from "./rental-workspace";
-import { validateRentalDataset } from "../domain/rental-validation";
 
 validateNorthstarRidgeDataset(snapshot);
 
@@ -50,7 +48,7 @@ export default function Home() {
             operational needs, and coordinate the work that keeps the fleet moving.
           </p>
           <nav className="project-links" aria-label="Project background">
-            <a href="#guided-walkthrough">Start guided walkthrough</a>
+            <a href="/workspace#guided-walkthrough">Start guided walkthrough</a>
             <a href="/project/role" target="_blank" rel="noopener noreferrer">My role in this project <span>(opens new tab)</span></a>
             <a href="/project/requirements" target="_blank" rel="noopener noreferrer">From requirements to product <span>(opens new tab)</span></a>
           </nav>
@@ -70,17 +68,16 @@ export default function Home() {
               <div className="icon-box"><HeadsetIcon /></div>
               <div className="card-copy"><p className="card-number">Workspace 01</p><h3>Customer Service</h3><p>Find suitable equipment and review readiness in the context of a customer request.</p></div>
               <span className="coming-soon">Available</span>
-              <a className="card-link" href="#customer-service">Enter workspace <ArrowIcon /></a>
+              <a className="card-link" href="/workspace">Enter workspace <ArrowIcon /></a>
             </article>
             <article className="workflow-card">
               <div className="icon-box"><WrenchIcon /></div>
               <div className="card-copy"><p className="card-number">Workspace 02</p><h3>Mechanic</h3><p>Review required work, document service evidence, and return equipment to operation.</p></div>
               <span className="coming-soon">Scoped demo</span>
-              <a className="card-link" href="#mechanic">Review resolution controls <ArrowIcon /></a>
+              <a className="card-link" href="/workspace#mechanic">Review resolution controls <ArrowIcon /></a>
             </article>
           </div>
         </section>
-        <RentalWorkspace source={validateRentalDataset(snapshot)} />
       </main>
 
       <footer><p>Northstar Ridge Equipment Group</p><p>Operational Readiness Demo · Rental workflow simulation</p></footer>
